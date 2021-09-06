@@ -245,7 +245,7 @@ def get_simple_context_data(request=None, app_namespace=None, model_namespace=No
     common_contexts["list_objects"] = model.objects.all().order_by('-id')
     if not list_template == None:
         common_contexts["list_template"] = list_template
-    common_contexts["fields_count"] = len(model._meta.get_fields()) + 1
+    common_contexts["fields_count"] = len(model._meta.get_fields()) + 2
     common_contexts["fields"] = dict([(f.name, f.verbose_name)
                                       for f in model._meta.fields + model._meta.many_to_many])
     if not fields_to_hide_in_table == None:

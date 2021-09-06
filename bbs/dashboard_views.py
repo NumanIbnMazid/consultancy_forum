@@ -70,7 +70,6 @@ class ThreadCreateView(CreateView):
         context['page_title'] = 'Create Thread'
         context['page_short_title'] = 'Create Thread'
         for key, value in get_thread_common_contexts(request=self.request).items():
-            print(key, value, "***")
             context[key] = value
         return context
 

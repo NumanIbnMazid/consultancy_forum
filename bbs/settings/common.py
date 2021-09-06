@@ -29,6 +29,11 @@ THIRD_PARTY_APPS = [
     'django.contrib.sites',
     'allauth',
     'allauth.account',
+    # Widget Tweaks
+    'widget_tweaks',
+    # Django Ck Editor
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 LOCAL_APPS = [
@@ -54,6 +59,10 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 """ *** Middlewares Definations *** """
+CUSTOM_MIDDLEWARES = [
+    # Request Middleware
+    'middlewares.middlewares.RequestMiddleware',
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -62,7 +71,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+] + CUSTOM_MIDDLEWARES
 
 """ *** Template Definations *** """
 TEMPLATES = [
@@ -119,6 +128,7 @@ SITE_ID = 1
 ROOT_URLCONF = 'bbs.urls'
 WSGI_APPLICATION = 'bbs.wsgi.application'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+HOME_URL = "/"
 
 """ *** Third Party Configurations *** """
 from bbs.settings.third_party_configs import *

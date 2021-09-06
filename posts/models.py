@@ -1,4 +1,5 @@
 from django.db import models
+from bbs.helpers import get_dynamic_fields
 from bbs.utils import (
     unique_slug_generator
 )
@@ -10,6 +11,12 @@ class Thread(models.Model):
     )
     slug = models.SlugField(
         unique=True
+    )
+    weight = models.PositiveIntegerField(
+        default=0, blank=True, null=True, verbose_name="thread weight"
+    )
+    description = models.TextField(
+        blank=True, null=True
     )
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name='created at'
@@ -25,6 +32,9 @@ class Thread(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_fields(self):
+        return [get_dynamic_fields(field, self) for field in self.__class__._meta.fields]
 
 
 # # -------------------------------------------------------------------

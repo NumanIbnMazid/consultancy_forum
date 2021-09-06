@@ -1,0 +1,43 @@
+{% block additional_styles %}
+
+<style>
+    /* CKeditor customization */
+    body {
+        --ck-z-default: 100;
+        --ck-z-modal: calc(var(--ck-z-default) + 999);
+    }
+</style>
+
+{% endblock %}
+
+<!-- Create Form Modal -->
+<div class="modal fade bg-opacity-mid" id="modal-create-{{namespace}}" tabindex="-1" role="dialog" aria-hidden="true"
+    data-focus="false">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content bg-c-white-raw">
+            <div class="modal-header">
+                <span class="modal-title font-bold font-17">{{ page_title }}</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form role="form" method="POST" data-toggle="validator" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="card-body">
+                        {% include 'dashboard/snippets/form.html' %}
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-lg btn-primary m-1">
+                            Submit
+                        </button>
+                        <button type="button" class="btn btn-lg btn-danger m-1" data-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

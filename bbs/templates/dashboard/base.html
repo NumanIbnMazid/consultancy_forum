@@ -1,0 +1,91 @@
+{% load static %}
+{% load custom_tags %}
+{% get_dashboard_setting as dashboard_setting %}
+
+<!DOCTYPE html>
+<html class="loading {{ dashboard_setting.skin }}" lang="en" data-layout="{{ dashboard_setting.skin }}" data-textdirection="ltr">
+
+<!-- BEGIN: Head -->
+
+<head>
+    <!-- BEGIN: Meta-Tags -->
+    {% include "dashboard/components/meta-tags.html" %}
+    <!-- END: Meta-Tags -->
+
+    <title>Django Empty Admin Dashboard</title>
+
+    <!-- BEGIN: Styles -->
+    {% include "dashboard/components/styles.html" %}
+    {% block additional_styles %}{% endblock %}
+    <!-- END: Styles -->
+
+</head>
+<!-- END: Head -->
+
+<!-- BEGIN: Body -->
+
+<body
+    class="vertical-layout vertical-menu-modern {{ dashboard_setting.navbar_type }} {{ dashboard_setting.footer_type }}
+    {{ dashboard_setting.get_menu_collapsed }}"
+    data-open="click"
+    data-menu="vertical-menu-modern" data-col="">
+
+    <!-- BEGIN: Header -->
+    {% include "dashboard/components/header.html" %}
+    <!-- END: Header -->
+
+
+    <!-- BEGIN: Left-Sidebar -->
+    {% include "dashboard/components/left-sidebar.html" %}
+    <!-- END: Left-Sidebar -->
+
+    <!-- BEGIN: Content -->
+    <div class="app-content content ">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="{{ dashboard_setting.get_layout_width }}">
+
+            <!-- BEGIN: Breadcrumb -->
+            {% if page_title %}
+            {% include "dashboard/components/breadcrumb.html" with page_title=page_title %}
+            {% else %}
+            {% include "dashboard/components/breadcrumb.html" with page_title="BBS" %}
+            {% endif %}
+            <!-- END: Breadcrumb -->
+
+            <!-- BEGIN: Content-Body -->
+            <div class="content-body">
+                <!-- BEGIN: Content-Body -->
+                {% include 'snippets/messages.html' %}
+                <!-- END: Content-Body -->
+
+                {% block content %}
+                {% endblock %}
+            </div>
+            <!-- END: Content-Body -->
+
+        </div>
+    </div>
+    <!-- END: Content -->
+
+    <!-- BEGIN: Theme-Customizer -->
+    {% include "dashboard/components/theme-customizer.html" %}
+    <!-- End: Theme-Customizer -->
+
+    <!-- BEGIN: Footer -->
+    {% include "dashboard/components/footer.html" %}
+    <!-- END: Footer -->
+
+    <!-- BEGIN: UTILS -->
+    {% include "dashboard/components/utils.html" %}
+    <!-- END: UTILS -->
+
+    <!-- BEGIN: Scripts -->
+    {% include "dashboard/components/scripts.html" %}
+    {% block additional_scripts %}{% endblock %}
+    <!-- END: Scripts -->
+
+</body>
+<!-- END: Body -->
+
+</html>

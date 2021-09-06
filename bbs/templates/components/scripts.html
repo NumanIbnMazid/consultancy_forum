@@ -1,0 +1,35 @@
+{% load static %}
+
+<!-- BEGIN: Vendor JS-->
+<script src="{% static 'assets/js/vendors.min.js' %}"></script>
+<!-- BEGIN Vendor JS-->
+
+<!-- BEGIN: Page Vendor JS-->
+<!-- END: Page Vendor JS-->
+
+<!-- BEGIN: Ajax Setup-->
+<script src="{% static 'assets/js/ajax-setup.js' %}"></script>
+<!-- END: Ajax Setup-->
+
+<!-- BEGIN: Theme JS-->
+<script src="{% static 'assets/js/app-menu.js' %}"></script>
+<script src="{% static 'assets/js/app.js' %}"></script>
+<script src="{% static 'assets/js/customizer.min.js' %}"></script>
+<script src="{% static 'assets/js/theme-customizer.js' %}"></script>
+<!-- END: Theme JS-->
+
+<!-- BEGIN: Custom JS-->
+<script src="{% static 'assets/js/scripts.js' %}"></script>
+<script src="{% static 'assets/js/custom.js' %}"></script>
+<!-- END: Custom JS-->
+
+<script>
+    $(window).on('load', function () {
+        if (feather) {
+            feather.replace({
+                width: 14,
+                height: 14
+            });
+        }
+    })
+</script>

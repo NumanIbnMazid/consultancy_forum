@@ -155,15 +155,15 @@ class UserWallet(models.Model):
         return self.user.get_dynamic_username()
     
 
-# @receiver(post_save, sender=User)
-# def assign_user_wallet_on_pre_save(sender, instance, **kwargs):
-#     """ Assigns Wallet to User on User pre_save hook """
-#     try:
-#         print("User Instance: ", instance)
-#         UserWallet.objects.create(
-#             user=instance
-#         )
-#     except Exception as E:
-#         raise Exception(
-#             f"Failed to create user wallet! Exception: {str(E)}"
-#         )
+@receiver(post_save, sender=User)
+def assign_user_wallet_on_pre_save(sender, instance, **kwargs):
+    """ Assigns Wallet to User on User pre_save hook """
+    try:
+        print("User Instance: ", instance)
+        UserWallet.objects.create(
+            user=instance
+        )
+    except Exception as E:
+        raise Exception(
+            f"Failed to create user wallet! Exception: {str(E)}"
+        )

@@ -1,10 +1,11 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from bbs.utils import simple_random_string
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 
 
 def generate_username_from_email(email):
@@ -123,3 +124,46 @@ class User(AbstractBaseUser, PermissionsMixin):
 def update_username_from_email(sender, instance, **kwargs):
     """ Generates and updates username from user email on User pre_save hook """
     instance.username = generate_username_from_email(email=instance.email)
+
+
+class UserWallet(models.Model):
+    user = models.OneToOneField(
+        get_user_model(), on_delete=models.CASCADE, related_name="user_wallet_user"
+    )
+    available_points = models.PositiveIntegerField(
+        default=0
+    )
+    is_in_flat_plan = models.BooleanField(
+        default=False
+    )
+    flat_plan_created_at = models.DateTimeField(
+        null=True
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='created at'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, verbose_name='updated at'
+    )
+
+    class Meta:
+        verbose_name = ("User Wallet")
+        verbose_name_plural = ("User Wallets")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.user.get_dynamic_username()
+    
+
+# @receiver(post_save, sender=User)
+# def assign_user_wallet_on_pre_save(sender, instance, **kwargs):
+#     """ Assigns Wallet to User on User pre_save hook """
+#     try:
+#         print("User Instance: ", instance)
+#         UserWallet.objects.create(
+#             user=instance
+#         )
+#     except Exception as E:
+#         raise Exception(
+#             f"Failed to create user wallet! Exception: {str(E)}"
+#         )

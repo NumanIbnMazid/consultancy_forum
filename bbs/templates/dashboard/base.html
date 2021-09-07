@@ -12,7 +12,7 @@
     {% include "dashboard/components/meta-tags.html" %}
     <!-- END: Meta-Tags -->
 
-    <title>Django Empty Admin Dashboard</title>
+    <title>{% block head_title %}BBS Dashboard{% endblock %} | BBS Dashboard</title>
 
     <!-- BEGIN: Styles -->
     {% include "dashboard/components/styles.html" %}

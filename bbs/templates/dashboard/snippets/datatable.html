@@ -3,6 +3,8 @@
 
 {% if can_view == True %}
 
+{% autoescape off %}
+
 <!-- Page content -->
 <div class="row">
     <div class="col">
@@ -189,5 +191,7 @@
         </div>
     </div>
 </div>
+
+{% endautoescape %}
 
 {% endif %}

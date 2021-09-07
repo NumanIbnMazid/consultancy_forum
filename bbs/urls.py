@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import url
+import debug_toolbar
 # from django.views.static import serve
 
 """ User Panel Views """
@@ -14,6 +15,10 @@ from .views import (
     DashboardView, 
     # Thread Views
     ThreadCreateView, ThreadUpdateView, ThreadDetailView, delete_thread,
+    # Point Plan Views
+    PointPlanCreateView, PointPlanUpdateView, PointPlanDetailView, delete_point_plan,
+    # Flat Rate Plan Views
+    FlatRatePlanCreateView, FlatRatePlanUpdateView, FlatRatePlanDetailView, delete_flat_rate_plan,
 )
 
 USER_PANEL_URLS = [
@@ -29,6 +34,16 @@ DASHBOARD_PANEL_URLS = [
     path("update-thread/<slug>/", ThreadUpdateView.as_view(), name="update_thread"),
     path("thread/<slug>/detail/", ThreadDetailView.as_view(), name="thread_detail"),
     path("delete/thread/", delete_thread, name="delete_thread"),
+    # ==============================*** Point Plan URLS ***==============================
+    path("create-point-plan/", PointPlanCreateView.as_view(), name="create_point_plan"),
+    path("update-point-plan/<slug>/", PointPlanUpdateView.as_view(), name="update_point_plan"),
+    path("point-plan/<slug>/detail/", PointPlanDetailView.as_view(), name="point_plan_detail"),
+    path("delete/point-plan/", delete_point_plan, name="delete_point_plan"),
+    # ==============================*** Flat Rate Plan URLS ***==============================
+    path("create-flat-rate-plan/", FlatRatePlanCreateView.as_view(), name="create_flat_rate_plan"),
+    path("update-flat-rate-plan/<slug>/", FlatRatePlanUpdateView.as_view(), name="update_flat_rate_plan"),
+    path("flat-rate-plan/<slug>/detail/", FlatRatePlanDetailView.as_view(), name="flat_rate_plan_detail"),
+    path("delete/flat-rate-plan/", delete_flat_rate_plan, name="delete_flat_rate_plan"),
 ]
 urlpatterns = [
     # For handling Static Files in Debug False Mode
@@ -40,6 +55,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('__debug__/', include(debug_toolbar.urls)),
 ] + USER_PANEL_URLS + DASHBOARD_PANEL_URLS
 
 if settings.DEBUG:

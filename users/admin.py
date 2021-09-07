@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User
+from .models import User, UserWallet
 
 
 class UserAdmin(BaseUserAdmin):
@@ -33,3 +33,13 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(User, UserAdmin)
+
+
+class UserWalletAdmin(admin.ModelAdmin):
+    list_display = ["user", "available_points", "is_in_flat_plan", "flat_plan_created_at", "created_at", "updated_at"]
+
+    class Meta:
+        model = UserWallet
+
+
+admin.site.register(UserWallet, UserWalletAdmin)

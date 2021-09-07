@@ -8,12 +8,16 @@ from django.contrib import messages
 from bbs.helpers import (
     validate_normal_form, get_simple_context_data, get_simple_object, delete_simple_object, user_has_permission
 )
-from posts.forms import (
-    ThreadManageForm
-)
-from posts.models import (
-    Thread
-)
+# *** Forms Import ***
+# Posts
+from posts.forms import (ThreadManageForm)
+# Plans
+from plans.forms import (PointPlanManageForm, FlatRatePlanManageForm)
+# *** Models Import ***
+# Posts
+from posts.models import (Thread)
+# Plans
+from plans.models import (PointPlan, FlatRatePlan)
 
 dashboard_decorators = [login_required, has_dashboard_permission_required]
 
@@ -36,7 +40,7 @@ class DashboardView(TemplateView):
 
 def get_thread_common_contexts(request):
     common_contexts = get_simple_context_data(
-        request=request, app_namespace=None, model_namespace="thread", model=Thread, list_template=None, fields_to_hide_in_table=[]
+        request=request, app_namespace=None, model_namespace="thread", model=Thread, list_template=None, fields_to_hide_in_table=["id", "slug"]
     )
     return common_contexts
 
@@ -140,3 +144,239 @@ class ThreadUpdateView(UpdateView):
 @login_required
 def delete_thread(request):
     return delete_simple_object(request=request, key='slug', model=Thread, redirect_url="create_thread")
+
+
+""" 
+-------------------------------------------------------------------
+                        ** Plans: PointPlan ***
+-------------------------------------------------------------------
+"""
+
+
+def get_point_plan_common_contexts(request):
+    common_contexts = get_simple_context_data(
+        request=request, app_namespace=None, model_namespace="point_plan", model=PointPlan, list_template=None, fields_to_hide_in_table=["id", "slug"]
+    )
+    return common_contexts
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class PointPlanCreateView(CreateView):
+    template_name = "dashboard/snippets/manage.html"
+    form_class = PointPlanManageForm
+
+    def form_valid(self, form, **kwargs):
+        title = form.instance.title
+        field_qs = PointPlan.objects.filter(
+            title__iexact=title
+        )
+        result = validate_normal_form(
+            field='title', field_qs=field_qs,
+            form=form, request=self.request
+        )
+        if result == 1:
+            return super().form_valid(form)
+        else:
+            return super().form_invalid(form)
+
+    def get_success_url(self):
+        return reverse("create_point_plan")
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            PointPlanCreateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = 'Create Point Plan'
+        context['page_short_title'] = 'Create Point Plan'
+        for key, value in get_point_plan_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class PointPlanDetailView(DetailView):
+    template_name = "dashboard/snippets/detail-common.html"
+
+    def get_object(self):
+        return get_simple_object(key='slug', model=PointPlan, self=self)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            PointPlanDetailView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'Point Plan - {self.get_object().title} Detail'
+        context['page_short_title'] = f'Point Plan - {self.get_object().title} Detail'
+        for key, value in get_point_plan_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class PointPlanUpdateView(UpdateView):
+    template_name = 'dashboard/snippets/manage.html'
+    form_class = PointPlanManageForm
+
+    def get_object(self):
+        return get_simple_object(key="slug", model=PointPlan, self=self)
+
+    def get_success_url(self):
+        return reverse("create_point_plan")
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        title = form.instance.title
+        if not self.object.title == title:
+            field_qs = PointPlan.objects.filter(
+                title__iexact=title
+            )
+            result = validate_normal_form(
+                field='title', field_qs=field_qs,
+                form=form, request=self.request
+            )
+            if result == 1:
+                return super().form_valid(form)
+            else:
+                return super().form_invalid(form)
+
+        messages.add_message(
+            self.request, messages.SUCCESS, "Point Plan Updated Successfully!"
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            PointPlanUpdateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'Update Point Plan "{self.get_object().title}"'
+        context['page_short_title'] = f'Update Point Plan "{self.get_object().title}"'
+        for key, value in get_point_plan_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@csrf_exempt
+@has_dashboard_permission_required
+@login_required
+def delete_point_plan(request):
+    return delete_simple_object(request=request, key='slug', model=PointPlan, redirect_url="create_point_plan")
+
+""" 
+-------------------------------------------------------------------
+                        ** Plans: FlatRatePlan ***
+-------------------------------------------------------------------
+"""
+
+
+def get_flat_rate_plan_common_contexts(request):
+    common_contexts = get_simple_context_data(
+        request=request, app_namespace=None, model_namespace="flat_rate_plan", model=FlatRatePlan, list_template=None, fields_to_hide_in_table=["id", "slug"]
+    )
+    return common_contexts
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class FlatRatePlanCreateView(CreateView):
+    template_name = "dashboard/snippets/manage.html"
+    form_class = FlatRatePlanManageForm
+
+    def form_valid(self, form, **kwargs):
+        title = form.instance.title
+        field_qs = FlatRatePlan.objects.filter(
+            title__iexact=title
+        )
+        result = validate_normal_form(
+            field='title', field_qs=field_qs,
+            form=form, request=self.request
+        )
+        if result == 1:
+            return super().form_valid(form)
+        else:
+            return super().form_invalid(form)
+
+    def get_success_url(self):
+        return reverse("create_flat_rate_plan")
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            FlatRatePlanCreateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = 'Create Flat Rate Plan'
+        context['page_short_title'] = 'Create Flat Rate Plan'
+        for key, value in get_flat_rate_plan_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class FlatRatePlanDetailView(DetailView):
+    template_name = "dashboard/snippets/detail-common.html"
+
+    def get_object(self):
+        return get_simple_object(key='slug', model=FlatRatePlan, self=self)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            FlatRatePlanDetailView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'Flat Rate Plan - {self.get_object().title} Detail'
+        context['page_short_title'] = f'Flat Rate Plan - {self.get_object().title} Detail'
+        for key, value in get_flat_rate_plan_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class FlatRatePlanUpdateView(UpdateView):
+    template_name = 'dashboard/snippets/manage.html'
+    form_class = FlatRatePlanManageForm
+
+    def get_object(self):
+        return get_simple_object(key="slug", model=FlatRatePlan, self=self)
+
+    def get_success_url(self):
+        return reverse("create_flat_rate_plan")
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        title = form.instance.title
+        if not self.object.title == title:
+            field_qs = FlatRatePlan.objects.filter(
+                title__iexact=title
+            )
+            result = validate_normal_form(
+                field='title', field_qs=field_qs,
+                form=form, request=self.request
+            )
+            if result == 1:
+                return super().form_valid(form)
+            else:
+                return super().form_invalid(form)
+
+        messages.add_message(
+            self.request, messages.SUCCESS, "Flat Rate Plan Updated Successfully!"
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            FlatRatePlanUpdateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'Update Flat Rate Plan "{self.get_object().title}"'
+        context['page_short_title'] = f'Update Flat Rate Plan "{self.get_object().title}"'
+        for key, value in get_flat_rate_plan_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@csrf_exempt
+@has_dashboard_permission_required
+@login_required
+def delete_flat_rate_plan(request):
+    return delete_simple_object(request=request, key='slug', model=FlatRatePlan, redirect_url="create_flat_rate_plan")
+
+
+""" 
+-------------------------------------------------------------------
+                        ** Plans: FlatRatePlan ***
+-------------------------------------------------------------------
+"""

@@ -5,6 +5,13 @@ from bbs.utils import (
 )
 from django.db.models.signals import post_save, pre_save
 
+
+""" 
+-------------------------------------------------------------------
+                            ** Thread ***
+-------------------------------------------------------------------
+"""
+
 class Thread(models.Model):
     title = models.CharField(
         max_length=254, unique=True

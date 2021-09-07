@@ -1,3 +1,10 @@
+
+/* start datatable style customization */
+.dt-button{
+    color: #327ff3 !important;
+}
+/* end datatable style customization */
+
 .hide{
     display: none !important;
 }

@@ -33,13 +33,19 @@
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="#">
                     <i data-feather="layout"></i>
-                    <span class="menu-title text-truncate" data-i18n="Collapsable Menu">Collapsable Menu</span>
+                    <span class="menu-title text-truncate" data-i18n="Collapsable Menu">Plans</span>
                 </a>
                 <ul class="menu-content">
                     <li>
-                        <a class="d-flex align-items-center" href="#">
-                            <i data-feather="circle"></i>
-                            <span class="menu-item text-truncate" data-i18n="Example Menu Item">Example Menu Item</span>
+                        <a class="d-flex align-items-center" href="{% url 'create_point_plan' %}">
+                            <i class="fas fa-coins"></i>
+                            <span class="menu-item text-truncate" data-i18n="Point Plans">Point Plans</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="d-flex align-items-center" href="{% url 'create_flat_rate_plan' %}">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span class="menu-item text-truncate" data-i18n="Point Plans">Flat Rate Plans</span>
                         </a>
                     </li>
                 </ul>

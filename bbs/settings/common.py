@@ -34,6 +34,8 @@ THIRD_PARTY_APPS = [
     # Django Ck Editor
     'ckeditor',
     'ckeditor_uploader',
+    # Django Debug Toolbar
+    'debug_toolbar',
 ]
 
 LOCAL_APPS = [
@@ -62,6 +64,8 @@ AUTHENTICATION_BACKENDS = [
 CUSTOM_MIDDLEWARES = [
     # Request Middleware
     'middlewares.middlewares.RequestMiddleware',
+    # Django Debug Toolbar Middleware
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -129,6 +133,9 @@ ROOT_URLCONF = 'bbs.urls'
 WSGI_APPLICATION = 'bbs.wsgi.application'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 HOME_URL = "/"
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
 
 """ *** Third Party Configurations *** """
 from bbs.settings.third_party_configs import *

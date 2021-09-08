@@ -159,10 +159,11 @@ class UserWallet(models.Model):
 def assign_user_wallet_on_pre_save(sender, instance, **kwargs):
     """ Assigns Wallet to User on User pre_save hook """
     try:
-        print("User Instance: ", instance)
-        UserWallet.objects.create(
-            user=instance
-        )
+        # check if created (Otherwise it will be called twice on created and saved hook)
+        if kwargs['created']:
+            UserWallet.objects.create(
+                user_id=instance.id
+            )
     except Exception as E:
         raise Exception(
             f"Failed to create user wallet! Exception: {str(E)}"

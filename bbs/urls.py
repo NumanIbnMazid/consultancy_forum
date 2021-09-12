@@ -48,9 +48,9 @@ DASHBOARD_PANEL_URLS = [
     path("delete/flat-rate-plan/", delete_flat_rate_plan, name="delete_flat_rate_plan"),
     # ==============================*** User Wallet Transaction URLS ***==============================
     path("create-user-wallet-transaction/", UserWalletTransactionCreateView.as_view(), name="create_user_wallet_transaction"),
-    path("update-user-wallet-transaction/<slug>/", UserWalletTransactionUpdateView.as_view(), name="update_user_wallet_transaction"),
+    # path("update-user-wallet-transaction/<slug>/", UserWalletTransactionUpdateView.as_view(), name="update_user_wallet_transaction"),
     path("user-wallet-transaction/<slug>/detail/", UserWalletTransactionDetailView.as_view(), name="user_wallet_transaction_detail"),
-    # path("delete/user-wallet-transaction/", delete_user_wallet_transaction, name="delete_user_wallet_transaction"),
+    path("delete/user-wallet-transaction/", delete_user_wallet_transaction, name="delete_user_wallet_transaction"),
 ]
 urlpatterns = [
     # For handling Static Files in Debug False Mode

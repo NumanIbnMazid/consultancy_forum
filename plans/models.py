@@ -6,7 +6,7 @@ from bbs.utils import (
     unique_slug_generator, simple_random_string
 )
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, pre_delete, post_delete
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from users.models import UserWallet
@@ -304,6 +304,54 @@ def update_user_wallet_on_post_save(sender, instance, **kwargs):
         # check if created (Otherwise it will be called twice on created and saved hook)
         if kwargs['created']:
             update_user_wallet()
+            
+    except Exception as E:
+        raise Exception(
+            f"Failed to update user wallet! Exception: {str(E)}"
+        )
+
+
+@receiver(pre_delete, sender=UserWalletTransaction)
+def update_user_wallet_on_pre_delete(sender, instance, **kwargs):
+    """ Updates User Wallet on User Wallet Transaction's pre_delete hook """
+    try:
+        def update_user_wallet():
+            # check if user wallet exists
+            user_wallet_qs = UserWallet.objects.filter(user=instance.user)
+            if user_wallet_qs.exists():
+                # get user wallet instance
+                user_wallet = user_wallet_qs.last()
+                # get transaction type to update on user wallet
+                transactionType = instance.transaction_type
+                # check if transaction type is point plan
+                if transactionType == 0:
+                    # calculate point
+                    calculated_points = user_wallet.available_points - instance.point_plan.point
+                    # update user wallet
+                    user_wallet_qs.update(
+                        available_points=calculated_points
+                    )
+                # check if transaction type is flat rate plan
+                elif transactionType == 1:
+                    user_wallet_qs.update(
+                        is_in_flat_plan=False,
+                        flat_plan_created_at=None
+                    )
+                # raise exception for improper transaction type
+                else:
+                    raise ValueError(
+                        f"Invalid transaction type {transactionType}. Availabe transaction types are [0: Point Plan, 1: Flat Rate Plan]"
+                    )
+            # create user wallet if not found
+            else:
+                UserWallet.objects.create(
+                    user=instance.user
+                )
+                update_user_wallet()
+            pass
+        
+        # Finally update the user wallet
+        update_user_wallet()
             
     except Exception as E:
         raise Exception(

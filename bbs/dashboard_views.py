@@ -413,6 +413,7 @@ class UserWalletTransactionCreateView(CreateView):
         context['page_short_title'] = 'Create User Wallet Transaction'
         for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
             context[key] = value
+        context["delete_url"] = None
         return context
 
 
@@ -427,10 +428,11 @@ class UserWalletTransactionDetailView(DetailView):
         context = super(
             UserWalletTransactionDetailView, self
         ).get_context_data(**kwargs)
-        context['page_title'] = f'User Wallet Transaction - {self.get_object().title} Detail'
-        context['page_short_title'] = f'User Wallet Transaction - {self.get_object().title} Detail'
+        context['page_title'] = f'User Wallet Transaction - {self.get_object().get_transaction_type_str()} Detail'
+        context['page_short_title'] = f'User Wallet Transaction - {self.get_object().get_transaction_type_str()} Detail'
         for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
             context[key] = value
+        context["delete_url"] = None
         return context
 
 
@@ -456,10 +458,11 @@ class UserWalletTransactionUpdateView(UpdateView):
         context = super(
             UserWalletTransactionUpdateView, self
         ).get_context_data(**kwargs)
-        context['page_title'] = f'Update User Wallet Transaction "{self.get_object().title}"'
-        context['page_short_title'] = f'Update User Wallet Transaction "{self.get_object().title}"'
+        context['page_title'] = f'Update User Wallet Transaction "{self.get_object().get_transaction_type_str()}"'
+        context['page_short_title'] = f'Update User Wallet Transaction "{self.get_object().get_transaction_type_str()}"'
         for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
             context[key] = value
+        context["delete_url"] = None
         return context
 
 

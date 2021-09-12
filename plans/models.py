@@ -3,10 +3,14 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import CheckConstraint, Q
 from bbs.helpers import get_dynamic_fields
 from bbs.utils import (
-    unique_slug_generator
+    unique_slug_generator, simple_random_string
 )
+from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
+from users.models import UserWallet
+from django.utils import timezone
 
 
 """ 
@@ -74,6 +78,8 @@ class PointPlan(models.Model):
         if self.currency == 1:
             return "USD"
         return "YEN"
+
+
 """ 
 -------------------------------------------------------------------
                             ** FlatRatePlan ***
@@ -155,6 +161,68 @@ class FlatRatePlan(models.Model):
         return "Monthly"
 
 
+""" 
+-------------------------------------------------------------------
+                    ** UserWalletTransaction ***
+-------------------------------------------------------------------
+"""
+
+class UserWalletTransaction(models.Model):
+    class TransactionType(models.IntegerChoices):
+        POINT = 0, _("Point")
+        FLATRATE = 1, _("Flat Rate")
+
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="user_wallet_transaction_users"
+    )
+    slug = models.SlugField(
+        unique=True
+    )
+    transaction_type = models.PositiveSmallIntegerField(
+        default=0, choices=TransactionType.choices
+    )
+    point_plan = models.ForeignKey(
+        PointPlan, on_delete=models.CASCADE, related_name="user_wallet_transaction_point_plans", blank=True, null=True
+    )
+    flat_rate_plan = models.ForeignKey(
+        FlatRatePlan, on_delete=models.CASCADE, related_name="user_wallet_transaction_flat_rate_plans", blank=True, null=True
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='created at'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, verbose_name='updated at'
+    )
+
+    class Meta:
+        verbose_name = ("UserWalletTransaction")
+        verbose_name_plural = ("UserWalletTransactions")
+        ordering = ["-created_at"]
+    
+    def __str__(self):
+        return self.user.get_dynamic_username()
+
+    def get_transaction_type_str(self):
+        if self.transaction_type == 1:
+            return "Flat Rate"
+        return "Point"
+
+    def get_fields(self):
+        def get_dynamic_fields(field):
+            if field.name == 'user':
+                return (field.name, self.user.get_dynamic_username(), field.get_internal_type())
+            elif field.name == 'transaction_type':
+                return (field.name, self.get_transaction_type_str(), field.get_internal_type())
+            elif field.name == 'point_plan':
+                return (field.name, self.point_plan.title if not self.point_plan == None else "-", field.get_internal_type())
+            elif field.name == 'flat_rate_plan':
+                return (field.name, self.flat_rate_plan.title if not self.flat_rate_plan == None else "-", field.get_internal_type())
+            else:
+                return (field.name, field.value_from_object(self), field.get_internal_type())
+        return [get_dynamic_fields(field) for field in self.__class__._meta.fields]
+
+
+
 # # -------------------------------------------------------------------
 # #                  Pre-Save Post-Save Configurations
 # # -------------------------------------------------------------------
@@ -182,3 +250,62 @@ def flat_rate_plan_slug_pre_save_receiver(sender, instance, *args, **kwargs):
 
 
 pre_save.connect(flat_rate_plan_slug_pre_save_receiver, sender=FlatRatePlan)
+
+
+# # UserWalletTransaction
+
+def user_wallet_transaction_slug_pre_save_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = simple_random_string()
+
+
+pre_save.connect(user_wallet_transaction_slug_pre_save_receiver, sender=UserWalletTransaction)
+
+
+@receiver(post_save, sender=UserWalletTransaction)
+def update_user_wallet_on_post_save(sender, instance, **kwargs):
+    """ Updates User Wallet on User Wallet Transaction's post_save hook """
+    try:
+        def update_user_wallet():
+            # check if user wallet exists
+            user_wallet_qs = UserWallet.objects.filter(user=instance.user)
+            if user_wallet_qs.exists():
+                # get user wallet instance
+                user_wallet = user_wallet_qs.last()
+                # get transaction type to update on user wallet
+                transactionType = instance.transaction_type
+                # check if transaction type is point plan
+                if transactionType == 0:
+                    # calculate point
+                    calculated_points = user_wallet.available_points + instance.point_plan.point
+                    # update user wallet
+                    user_wallet_qs.update(
+                        available_points=calculated_points
+                    )
+                # check if transaction type is flat rate plan
+                elif transactionType == 1:
+                    user_wallet_qs.update(
+                        is_in_flat_plan=True,
+                        flat_plan_created_at=timezone.now()
+                    )
+                # raise exception for improper transaction type
+                else:
+                    raise ValueError(
+                        f"Invalid transaction type {transactionType}. Availabe transaction types are [0: Point Plan, 1: Flat Rate Plan]"
+                    )
+            # create user wallet if not found
+            else:
+                UserWallet.objects.create(
+                    user=instance.user
+                )
+                update_user_wallet()
+            pass
+        
+        # check if created (Otherwise it will be called twice on created and saved hook)
+        if kwargs['created']:
+            update_user_wallet()
+            
+    except Exception as E:
+        raise Exception(
+            f"Failed to update user wallet! Exception: {str(E)}"
+        )

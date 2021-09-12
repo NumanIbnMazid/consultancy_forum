@@ -12,12 +12,13 @@ from bbs.helpers import (
 # Posts
 from posts.forms import (ThreadManageForm)
 # Plans
-from plans.forms import (PointPlanManageForm, FlatRatePlanManageForm)
+from plans.forms import (
+    PointPlanManageForm, FlatRatePlanManageForm, UserWalletTransactionManageForm)
 # *** Models Import ***
 # Posts
 from posts.models import (Thread)
 # Plans
-from plans.models import (PointPlan, FlatRatePlan)
+from plans.models import (PointPlan, FlatRatePlan, UserWalletTransaction)
 
 dashboard_decorators = [login_required, has_dashboard_permission_required]
 
@@ -377,6 +378,93 @@ def delete_flat_rate_plan(request):
 
 """ 
 -------------------------------------------------------------------
-                        ** Plans: FlatRatePlan ***
+                ** Plans: UserWalletTransaction ***
 -------------------------------------------------------------------
 """
+
+
+def get_user_wallet_transaction_common_contexts(request):
+    common_contexts = get_simple_context_data(
+        request=request, app_namespace=None, model_namespace="user_wallet_transaction", model=UserWalletTransaction, list_template=None, fields_to_hide_in_table=["id", "slug"]
+    )
+    return common_contexts
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class UserWalletTransactionCreateView(CreateView):
+    template_name = "user-wallet-transaction/manage.html"
+    form_class = UserWalletTransactionManageForm
+
+    def form_valid(self, form, **kwargs):
+        # title = form.instance.title
+        messages.add_message(
+            self.request, messages.SUCCESS, "User wallet transaction created successfully!"
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("create_user_wallet_transaction")
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            UserWalletTransactionCreateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = 'Create User Wallet Transaction'
+        context['page_short_title'] = 'Create User Wallet Transaction'
+        for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class UserWalletTransactionDetailView(DetailView):
+    template_name = "user-wallet-transaction/detail-common.html"
+
+    def get_object(self):
+        return get_simple_object(key='slug', model=UserWalletTransaction, self=self)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            UserWalletTransactionDetailView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'User Wallet Transaction - {self.get_object().title} Detail'
+        context['page_short_title'] = f'User Wallet Transaction - {self.get_object().title} Detail'
+        for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class UserWalletTransactionUpdateView(UpdateView):
+    template_name = 'user-wallet-transaction/manage.html'
+    form_class = UserWalletTransactionManageForm
+
+    def get_object(self):
+        return get_simple_object(key="slug", model=UserWalletTransaction, self=self)
+
+    def get_success_url(self):
+        return reverse("create_flat_rate_plan")
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        messages.add_message(
+            self.request, messages.SUCCESS, "User wallet transaction updated successfully!"
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            UserWalletTransactionUpdateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'Update User Wallet Transaction "{self.get_object().title}"'
+        context['page_short_title'] = f'Update User Wallet Transaction "{self.get_object().title}"'
+        for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@csrf_exempt
+@has_dashboard_permission_required
+@login_required
+def delete_user_wallet_transaction(request):
+    return delete_simple_object(request=request, key='slug', model=UserWalletTransaction, redirect_url="create_user_wallet_transaction")

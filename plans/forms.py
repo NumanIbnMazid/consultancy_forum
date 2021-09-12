@@ -1,5 +1,7 @@
 from django import forms
-from plans.models import PointPlan, FlatRatePlan
+from plans.models import PointPlan, FlatRatePlan, UserWalletTransaction
+from django_select2 import forms as s2forms
+
 
 """ 
 -------------------------------------------------------------------
@@ -46,3 +48,32 @@ class FlatRatePlanManageForm(forms.ModelForm):
         fields = [
             "title", "price", "currency", "expiration_cycle"
         ]
+
+
+""" 
+-------------------------------------------------------------------
+                    ** UserWalletTransaction ***
+-------------------------------------------------------------------
+"""
+
+
+class UserWidget(s2forms.ModelSelect2Widget):
+    search_fields = [
+        "username__icontains",
+        "email__icontains",
+        "contact_number__icontains",
+    ]
+
+class UserWalletTransactionManageForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        super(UserWalletTransactionManageForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = UserWalletTransaction
+        fields = [
+            "user", "transaction_type", "point_plan", "flat_rate_plan"
+        ]
+        widgets = {
+            "user": UserWidget
+        }

@@ -1,5 +1,6 @@
 """ # Project Common Settings # """
 # imports
+from bbs.settings.third_party_configs import *
 from pathlib import Path
 import os
 import environ
@@ -36,6 +37,8 @@ THIRD_PARTY_APPS = [
     'ckeditor_uploader',
     # Django Debug Toolbar
     'debug_toolbar',
+    # Django Select 2
+    'django_select2',
 ]
 
 LOCAL_APPS = [
@@ -124,8 +127,10 @@ MEDIA_URL = '/media/'
 STATICFILES_DIRS = [
     os.path.join(BASE_APP_DIR, 'static'),
 ]
-STATIC_ROOT = os.path.join(BASE_APP_DIR, os.path.join('static_cdn', 'static_root'))
-MEDIA_ROOT = os.path.join(BASE_APP_DIR, os.path.join('static_cdn', 'media_root'))
+STATIC_ROOT = os.path.join(
+    BASE_APP_DIR, os.path.join('static_cdn', 'static_root'))
+MEDIA_ROOT = os.path.join(
+    BASE_APP_DIR, os.path.join('static_cdn', 'media_root'))
 
 """ *** Other Definations *** """
 SITE_ID = 1
@@ -136,6 +141,25 @@ HOME_URL = "/"
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        # 'LOCATION': [
+        #     '127.0.0.1:11211'
+        #     '172.19.26.240:11211',
+        #     '172.19.26.242:11211',
+        # ]
+    },
+    "select2": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# Tell select2 which cache configuration to use:
+SELECT2_CACHE_BACKEND = "select2"
 
 """ *** Third Party Configurations *** """
-from bbs.settings.third_party_configs import *

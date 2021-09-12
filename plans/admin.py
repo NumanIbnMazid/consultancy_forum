@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PointPlan, FlatRatePlan
+from .models import PointPlan, FlatRatePlan, UserWalletTransaction
 
 
 class PointPlanAdmin(admin.ModelAdmin):
@@ -20,3 +20,13 @@ class FlatRatePlanAdmin(admin.ModelAdmin):
 
 
 admin.site.register(FlatRatePlan, FlatRatePlanAdmin)
+
+
+class UserWalletTransactionAdmin(admin.ModelAdmin):
+    list_display = ["user", "slug", "transaction_type", "point_plan", "flat_rate_plan", "created_at", "updated_at"]
+
+    class Meta:
+        model = UserWalletTransaction
+
+
+admin.site.register(UserWalletTransaction, UserWalletTransactionAdmin)

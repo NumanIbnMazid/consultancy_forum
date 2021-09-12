@@ -19,6 +19,8 @@ from .views import (
     PointPlanCreateView, PointPlanUpdateView, PointPlanDetailView, delete_point_plan,
     # Flat Rate Plan Views
     FlatRatePlanCreateView, FlatRatePlanUpdateView, FlatRatePlanDetailView, delete_flat_rate_plan,
+    # User Wallet Transaction
+    UserWalletTransactionCreateView, UserWalletTransactionUpdateView, UserWalletTransactionDetailView, delete_user_wallet_transaction
 )
 
 USER_PANEL_URLS = [
@@ -44,6 +46,11 @@ DASHBOARD_PANEL_URLS = [
     path("update-flat-rate-plan/<slug>/", FlatRatePlanUpdateView.as_view(), name="update_flat_rate_plan"),
     path("flat-rate-plan/<slug>/detail/", FlatRatePlanDetailView.as_view(), name="flat_rate_plan_detail"),
     path("delete/flat-rate-plan/", delete_flat_rate_plan, name="delete_flat_rate_plan"),
+    # ==============================*** User Wallet Transaction URLS ***==============================
+    path("create-user-wallet-transaction/", UserWalletTransactionCreateView.as_view(), name="create_user_wallet_transaction"),
+    path("update-user-wallet-transaction/<slug>/", UserWalletTransactionUpdateView.as_view(), name="update_user_wallet_transaction"),
+    path("user-wallet-transaction/<slug>/detail/", UserWalletTransactionDetailView.as_view(), name="user_wallet_transaction_detail"),
+    path("delete/user-wallet-transaction/", delete_user_wallet_transaction, name="delete_user_wallet_transaction"),
 ]
 urlpatterns = [
     # For handling Static Files in Debug False Mode
@@ -55,6 +62,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path("select2/", include("django_select2.urls")),
     path('__debug__/', include(debug_toolbar.urls)),
 ] + USER_PANEL_URLS + DASHBOARD_PANEL_URLS
 

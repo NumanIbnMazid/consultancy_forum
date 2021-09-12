@@ -156,13 +156,13 @@ class UserWallet(models.Model):
     
 
 @receiver(post_save, sender=User)
-def assign_user_wallet_on_pre_save(sender, instance, **kwargs):
-    """ Assigns Wallet to User on User pre_save hook """
+def assign_user_wallet_on_post_save(sender, instance, **kwargs):
+    """ Assigns Wallet to User on User post_save hook """
     try:
         # check if created (Otherwise it will be called twice on created and saved hook)
         if kwargs['created']:
             UserWallet.objects.create(
-                user_id=instance.id
+                user=instance
             )
     except Exception as E:
         raise Exception(

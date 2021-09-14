@@ -1,4 +1,10 @@
 
+/* start select-2 style customization */
+.select2-selection__rendered{
+    color: #327ff3 !important;
+}
+/* end select-2 style customization */
+
 /* start datatable style customization */
 .dt-button{
     color: #327ff3 !important;

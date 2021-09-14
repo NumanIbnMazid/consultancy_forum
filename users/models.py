@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
-from bbs.utils import simple_random_string
+from bbs.utils import simple_random_string, unique_slug_generator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
@@ -57,6 +57,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         max_length=254, unique=True
     )
+    slug = models.SlugField(
+        unique=True
+    )
     name = models.CharField(
         max_length=254, null=True, blank=True
     )
@@ -93,6 +96,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    class Meta:
+        verbose_name = ("User")
+        verbose_name_plural = ("Users")
+        ordering = ["-date_joined"]
+
     def get_absolute_url(self):
         return "/users/%i/" % (self.pk)
 
@@ -121,14 +129,19 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 @receiver(pre_save, sender=User)
-def update_username_from_email(sender, instance, **kwargs):
-    """ Generates and updates username from user email on User pre_save hook """
+def update_username_and_slug_from_email(sender, instance, **kwargs):
+    """ Generates and updates username from user email and updates slug on User pre_save hook """
     instance.username = generate_username_from_email(email=instance.email)
+    if not instance.slug:
+        instance.slug = simple_random_string()
 
 
 class UserWallet(models.Model):
     user = models.OneToOneField(
         get_user_model(), on_delete=models.CASCADE, related_name="user_wallet_user"
+    )
+    slug = models.SlugField(
+        unique=True
     )
     available_points = models.PositiveIntegerField(
         default=0
@@ -153,6 +166,14 @@ class UserWallet(models.Model):
 
     def __str__(self):
         return self.user.get_dynamic_username()
+
+
+def user_wallet_slug_pre_save_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = simple_random_string()
+
+
+pre_save.connect(user_wallet_slug_pre_save_receiver, sender=UserWallet)
     
 
 @receiver(post_save, sender=User)
@@ -168,3 +189,51 @@ def assign_user_wallet_on_post_save(sender, instance, **kwargs):
         raise Exception(
             f"Failed to create user wallet! Exception: {str(E)}"
         )
+
+
+class Husband(models.Model):
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="husband_users"
+    )
+    slug = models.SlugField(
+        unique=True
+    )
+    name = models.CharField(
+        max_length=100
+    )
+    nationality = models.CharField(
+        max_length=50
+    )
+    address = models.CharField(
+        max_length=254, blank=True, null=True
+    )
+    dob = models.DateField(
+        blank=True, null=True, verbose_name="Date of Birth"
+    )
+    characteristics = models.TextField(
+        blank=True, null=True
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='created at'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, verbose_name='updated at'
+    )
+
+    class Meta:
+        verbose_name = ("User Husband")
+        verbose_name_plural = ("User Husbands")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.name
+
+
+def husband_slug_pre_save_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = unique_slug_generator(
+            instance=instance, field=instance.name
+        )
+
+
+pre_save.connect(husband_slug_pre_save_receiver, sender=Husband)

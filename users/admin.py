@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User, UserWallet
+from .models import User, UserWallet, Husband
 
 
 class UserAdmin(BaseUserAdmin):
@@ -25,7 +25,7 @@ class UserAdmin(BaseUserAdmin):
         ),
     )
 
-    list_display = ('email', 'username', 'name', 'gender', 'membership_type', 'contact_number', 'is_staff', 'last_login')
+    list_display = ('email', 'username', 'slug', 'name', 'gender', 'membership_type', 'contact_number', 'is_staff', 'last_login')
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     search_fields = ('email',)
     ordering = ('email',)
@@ -36,10 +36,20 @@ admin.site.register(User, UserAdmin)
 
 
 class UserWalletAdmin(admin.ModelAdmin):
-    list_display = ["user", "available_points", "is_in_flat_plan", "flat_plan_created_at", "created_at", "updated_at"]
+    list_display = ["user", "slug", "available_points", "is_in_flat_plan", "flat_plan_created_at", "created_at", "updated_at"]
 
     class Meta:
         model = UserWallet
 
 
 admin.site.register(UserWallet, UserWalletAdmin)
+
+
+class HusbandAdmin(admin.ModelAdmin):
+    list_display = ["user", "slug", "name", "nationality", "address", "dob", "characteristics", "created_at", "updated_at"]
+
+    class Meta:
+        model = Husband
+
+
+admin.site.register(Husband, HusbandAdmin)

@@ -5,10 +5,10 @@ from django.conf.urls.static import static
 from django.conf.urls import url
 import debug_toolbar
 # from django.views.static import serve
-
+from . import views
 """ User Panel Views """
 from .views import (
-    HomeView,
+    HomeView,create_husband
 )
 """ Dashboard Views """
 from .views import (
@@ -25,6 +25,7 @@ from .views import (
 
 USER_PANEL_URLS = [
     path("", HomeView.as_view(), name="home"),
+    path('husband_create/', views.create_husband, name='create_husband')
 ]
 
 DASHBOARD_PANEL_URLS = [

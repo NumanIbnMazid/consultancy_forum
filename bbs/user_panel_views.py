@@ -2,7 +2,14 @@ from django.views.generic import TemplateView
 from users.models import Husband
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+
+from django.contrib import messages
+from django.urls import reverse
+from .forms import HusbandManageForm
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.views import View
 
 class HomeView(TemplateView):
     template_name = "user-panel/index.html"
@@ -12,6 +19,48 @@ class HomeView(TemplateView):
         context["page_title"] = "Home"
         return context
 
+@login_required()
+def user_profile(request):
+    husband_lists = Husband.objects.filter(user  = request.user)
+    context = {'husband_lists':husband_lists}
+    return render(request,'user-panel/profile.html', context)
 
+@login_required()
 def create_husband(request):
-    return render(request, 'user-panel/husband.html')
+    # template_name = "user-panel/husband.html"
+    form = HusbandManageForm
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            name = request.POST.get('name')
+            nationality = request.POST.get('nationality')
+            address = request.POST.get('address')
+            dob = request.POST.get('dob')
+            characteristics = request.POST.get('characteristics')
+            husband_qs = Husband.objects.filter(name__iexact = name).last()
+            if not husband_qs:
+                Husband.objects.create(user = user, name = name, nationality = nationality,
+                                   address = address, dob=dob,characteristics=characteristics)
+    context ={'form':form}
+    return render(request, 'user-panel/husband.html', context)
+
+@login_required()
+def husband_details(request, slug):
+    husband_qs = Husband.objects.filter(slug=slug).last()
+    form = HusbandManageForm(instance=husband_qs)
+    is_details = True
+    context = {'form': form,'is_details':is_details}
+    return render(request, 'user-panel/husband.html', context)
+
+@login_required()
+def husband_update(request, slug):
+    husband_qs = Husband.objects.filter(slug=slug).last()
+    form = HusbandManageForm(instance=husband_qs)
+    url = request.path
+    if request.method == 'POST':
+        form = HusbandManageForm(request.POST, partial=True ,instance=husband_qs)
+        if form.is_valid():
+            form.save()
+    context = {'form': form}
+    return render(request, 'user-panel/husband.html', context)

@@ -6,6 +6,7 @@ from django.utils import timezone
 from bbs.utils import simple_random_string, unique_slug_generator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from bbs.helpers import get_dynamic_fields
 
 
 def generate_username_from_email(email):
@@ -228,12 +229,14 @@ class Husband(models.Model):
     def __str__(self):
         return self.name
 
+    def get_fields(self):
+        return [get_dynamic_fields(field, self) for field in self.__class__._meta.fields]
+
+
 
 def husband_slug_pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = unique_slug_generator(
             instance=instance, field=instance.name
         )
-
-
 pre_save.connect(husband_slug_pre_save_receiver, sender=Husband)

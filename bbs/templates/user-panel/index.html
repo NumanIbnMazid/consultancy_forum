@@ -50,6 +50,11 @@
                             <span class="avatar-status-online"></span>
                         </span>
                     </a>
+                    <li class="nav-item d-none d-lg-block ml-2">
+                    <a href="{% url 'user_profile' %}" class="btn btn-success btn-md fw-bold">
+                        <i class="fa fa-location-arrow"></i> Profile
+                    </a>
+                </li>
                     <a class="dropdown-item" href="{{ logout_url }}">
                         <i class="mr-50" data-feather="power"></i>
                         Logout

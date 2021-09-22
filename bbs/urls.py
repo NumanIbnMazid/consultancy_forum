@@ -8,7 +8,7 @@ import debug_toolbar
 from . import views
 """ User Panel Views """
 from .views import (
-    HomeView,create_husband
+    HomeView, create_husband
 )
 """ Dashboard Views """
 from .views import (
@@ -20,12 +20,17 @@ from .views import (
     # Flat Rate Plan Views
     FlatRatePlanCreateView, FlatRatePlanUpdateView, FlatRatePlanDetailView, delete_flat_rate_plan,
     # User Wallet Transaction
-    UserWalletTransactionCreateView, UserWalletTransactionUpdateView, UserWalletTransactionDetailView, delete_user_wallet_transaction
+    UserWalletTransactionCreateView, UserWalletTransactionUpdateView, UserWalletTransactionDetailView,
+    delete_user_wallet_transaction
 )
 
 USER_PANEL_URLS = [
     path("", HomeView.as_view(), name="home"),
-    path('husband_create/', views.create_husband, name='create_husband')
+    path('create-husband/', views.create_husband, name='create_husband'),
+    path('husband-details/<slug>/', views.husband_details, name='husband_details'),
+    path('husband-update/<slug>/', views.husband_update, name='husband_update'),
+    path('user_profile/', views.user_profile, name="user_profile"),
+    # path('account/', views.accountSettings, name="account"),
 ]
 
 DASHBOARD_PANEL_URLS = [

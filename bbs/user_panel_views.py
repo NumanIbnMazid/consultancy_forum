@@ -42,10 +42,12 @@ def create_husband(request):
             characteristics = request.POST.get('characteristics')
             husband_qs = Husband.objects.filter(name__iexact = name).last()
             if not husband_qs:
-                Husband.objects.create(user = user, name = name, nationality = nationality,
+                husband_qs = Husband.objects.create(user = user, name = name, nationality = nationality,
                                    address = address, dob=dob,characteristics=characteristics)
+                if husband_qs:
+                    return HttpResponseRedirect(reverse('user_profile'))
     context ={'form':form}
-    return render(request, 'user-panel/husband.html', context)
+    return render(request, 'user-panel/form.html', context)
 
 @login_required()
 def husband_details(request, slug):
@@ -53,7 +55,7 @@ def husband_details(request, slug):
     form = HusbandManageForm(instance=husband_qs)
     is_details = True
     context = {'form': form,'is_details':is_details}
-    return render(request, 'user-panel/husband.html', context)
+    return render(request, 'user-panel/form.html', context)
 
 @login_required()
 def husband_update(request, slug):
@@ -61,11 +63,12 @@ def husband_update(request, slug):
     form = HusbandManageForm(instance=husband_qs)
     url = request.path
     if request.method == 'POST':
-        form = HusbandManageForm(request.POST, partial=True ,instance=husband_qs)
+        form = HusbandManageForm(request.POST,instance=husband_qs)
         if form.is_valid():
             form.save()
+            return HttpResponseRedirect(reverse('user_profile'))
     context = {'form': form}
-    return render(request, 'user-panel/husband.html', context)
+    return render(request, 'user-panel/form.html', context)
 
 
 @login_required()
@@ -85,4 +88,34 @@ def create_post(request):
             if post_qs:
                 return HttpResponseRedirect(reverse('user_profile'))
     context ={'form':form}
-    return render(request, 'user-panel/husband.html', context)
+    return render(request, 'user-panel/form.html', context)
+
+@login_required()
+def post_details(request, slug):
+    post_qs = Post.objects.filter(slug=slug).last()
+    form = PostManageForm(instance=post_qs)
+    is_details = True
+    context = {'form': form,'post_qs':post_qs}
+    return render(request, 'user-panel/form.html', context)
+
+@login_required()
+def post_update(request, slug):
+    post_qs = Post.objects.filter(slug=slug).last()
+    form = PostManageForm(instance=post_qs)
+    if request.method == 'POST':
+        form = PostManageForm(request.POST,instance=post_qs)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('user_profile'))
+    context = {'form': form}
+    return render(request, 'user-panel/form.html', context)
+
+@login_required()
+def post_delete(request, slug):
+    post_qs = Post.objects.filter(slug=slug).last()
+    form = PostManageForm(instance=post_qs)
+    if post_qs:
+        post_qs.delete()
+        return HttpResponseRedirect(reverse('user_profile'))
+    context = {'form': form}
+    return render(request, 'user-panel/form.html', context)

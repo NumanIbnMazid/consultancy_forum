@@ -3,10 +3,10 @@ from users.models import Husband
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
-
+from posts.models import Post
 from django.contrib import messages
 from django.urls import reverse
-from .forms import HusbandManageForm
+from .forms import HusbandManageForm, PostManageForm
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views import View
@@ -22,7 +22,9 @@ class HomeView(TemplateView):
 @login_required()
 def user_profile(request):
     husband_lists = Husband.objects.filter(user  = request.user)
-    context = {'husband_lists':husband_lists}
+    post_lists = Post.objects.all()
+    context = {'husband_lists':husband_lists,
+               'post_lists':post_lists}
     return render(request,'user-panel/profile.html', context)
 
 @login_required()
@@ -63,4 +65,24 @@ def husband_update(request, slug):
         if form.is_valid():
             form.save()
     context = {'form': form}
+    return render(request, 'user-panel/husband.html', context)
+
+
+@login_required()
+def create_post(request):
+    # template_name = "user-panel/husband.html"
+    form = PostManageForm
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            title = request.POST.get('title')
+            thread = request.POST.get('thread')
+            weight = request.POST.get('weight')
+            description = request.POST.get('description')
+            post_qs = Post.objects.create(user = user, title = title, thread_id = thread,
+                               weight = weight, description=description)
+            if post_qs:
+                return HttpResponseRedirect(reverse('user_profile'))
+    context ={'form':form}
     return render(request, 'user-panel/husband.html', context)

@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_tags %}
 {% include 'user-panel/index.html' %}
 <style>
     table, td, th {
@@ -49,6 +50,37 @@ table {
             <td>{{ husband.dob }}</td>
             <td><a href="{% url 'husband_details' husband.slug %}">Details</a></td>
             <td><a href="{% url 'husband_update' husband.slug %}">Update</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<a href="{% url 'create_post' %}"><h4>+ create post</h4></a>
+{% if post_lists %}
+<h4>Post</h4>
+<table>
+    <thead>
+        <tr>
+            <th> Title</th>
+            <th> Thread</th>
+            <th> weight</th>
+            <th> Description</th>
+            <th>Details</th>
+            <th>Update</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for post in post_lists %}
+        <tr>
+            <td>{{ post.title }}</td>
+            <td>{{ post.thread }}</td>
+            <td>{{ post.description|truncate_word:30|safe }}</td>
+            <td>{{ post.weight }}</td>
+            <td><a href="">Details</a></td>
+            <td><a href="">Update</a></td>
+            <td><a href="">Delete</a></td>
         </tr>
     {% endfor %}
     </tbody>

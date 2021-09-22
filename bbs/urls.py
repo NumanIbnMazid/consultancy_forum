@@ -30,7 +30,8 @@ USER_PANEL_URLS = [
     path('husband-details/<slug>/', views.husband_details, name='husband_details'),
     path('husband-update/<slug>/', views.husband_update, name='husband_update'),
     path('user_profile/', views.user_profile, name="user_profile"),
-    # path('account/', views.accountSettings, name="account"),
+
+    path('create-post/', views.create_post, name='create_post'),
 ]
 
 DASHBOARD_PANEL_URLS = [

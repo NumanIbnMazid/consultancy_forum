@@ -172,3 +172,33 @@ def post_delete(request, slug):
         return HttpResponseRedirect(reverse('user_profile'))
     context = {'form': form}
     return render(request, 'user-panel/form.html', context)
+
+
+# #-----------------------------***-----------------------------
+# #----------------------Post Comment Reply --------------------
+# #-----------------------------***-----------------------------
+@login_required()
+def comment_reply(request, id):
+    comment_qs = Comment.objects.filter(id=id)
+    if comment_qs:
+        comment_object = comment_qs.last()
+        slug = comment_object.post.slug
+        post_qs = Post.objects.filter(slug=slug).last()
+        page_title = post_qs.title
+        form = PostManageForm(instance=post_qs)
+        context = {'form': form,'post_qs':post_qs,'page_title':page_title}
+
+        if request.method == 'POST':
+            if request.user.is_authenticated:
+                reply = request.POST.get("reply")
+                CommentReply.objects.create(
+                    comment=comment_object,
+                    replied_by=request.user,
+                    reply=reply
+                )
+                return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+            else:
+                return HttpResponseRedirect(reverse("account_login"))
+
+
+    return render(request, 'user-panel/post-details.html', context)

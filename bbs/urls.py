@@ -42,6 +42,7 @@ USER_PANEL_URLS = [
     path('post-details/<slug>/', views.post_details, name='post_details'),
     path('post-update/<slug>/', views.post_update, name='post_update'),
     path('post_delete/<slug>/', views.post_delete, name='post_delete'),
+    path('comment-reply/<id>/', views.comment_reply, name='comment_reply'),
 ]
 
 DASHBOARD_PANEL_URLS = [

@@ -134,11 +134,12 @@ def post_details(request, slug):
     if request.method == 'POST':
         if request.user.is_authenticated:
             comment = request.POST.get("comment")
-            Comment.objects.create(
-                post=post_qs,
-                commented_by=request.user,
-                comment=comment
-            )
+            if comment:
+                Comment.objects.create(
+                    post=post_qs,
+                    commented_by=request.user,
+                    comment=comment
+                )
             return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
         else:
             return HttpResponseRedirect(reverse("account_login"))
@@ -194,11 +195,12 @@ def comment_reply(request, id):
         if request.method == 'POST':
             if request.user.is_authenticated:
                 reply = request.POST.get("reply")
-                CommentReply.objects.create(
-                    comment=comment_object,
-                    replied_by=request.user,
-                    reply=reply
-                )
+                if reply:
+                    CommentReply.objects.create(
+                        comment=comment_object,
+                        replied_by=request.user,
+                        reply=reply
+                    )
                 return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
             else:
                 return HttpResponseRedirect(reverse("account_login"))

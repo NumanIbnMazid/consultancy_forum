@@ -30,10 +30,11 @@ class HomeView(TemplateView):
 
 @login_required()
 def user_profile(request):
+    page_title = request.user.username
     husband_lists = Husband.objects.filter(user  = request.user)
     post_lists = Post.objects.all()
     context = {'husband_lists':husband_lists,
-               'post_lists':post_lists}
+               'post_lists':post_lists,'page_title':page_title}
     return render(request,'user-panel/profile.html', context)
 
 

@@ -1,16 +1,7 @@
 {% load static %}
 {% load custom_tags %}
-{% include 'user-panel/index.html' %}
-<style>
-    table, td, th {
-  border: 1px solid black;
-}
-table {
-  width: 100%;
+{% include 'user-panel/base.html' %}
 
-  border-collapse: collapse;
-}
-</style>
 
 <center>
     <h3 style="color:red"><u>{{ page_title  }} Profile</u></h3>
@@ -33,7 +24,9 @@ table {
 
 <a href="{% url 'create_husband' %}"><h4>+ create husband</h4></a>
 {% if husband_lists %}
-<h4>Husband Informations</h4>
+<center>
+    <h3 style="color:red"><u>Husband Information</u></h3>
+</center>
 <table>
     <thead>
         <tr>
@@ -62,7 +55,9 @@ table {
 
 <a href="{% url 'create_post' %}"><h4>+ create post</h4></a>
 {% if post_lists %}
-<h4>Post</h4>
+<center>
+    <h3 style="color:red"><u>Post</u></h3>
+</center>
 <table>
     <thead>
         <tr>
@@ -90,3 +85,4 @@ table {
     </tbody>
 </table>
 {% endif %}
+

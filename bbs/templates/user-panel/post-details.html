@@ -23,13 +23,12 @@
 			{% for reply in comment.comment_replies.all %}
 				<p>reply : {{ reply.reply }}</p>
 				{% endfor %}
-			<form method="POST" action="{% url 'comment_reply' id=comment.id %}" enctype="multipart/form-data">
+					<form method="POST" action="{% url 'comment_reply' id=comment.id %}" enctype="multipart/form-data">
 						{% csrf_token %}
 						<textarea class="form-control" name="reply" rows="3" id="reply"></textarea>
 						<button type="submit">Reply</button>
 
 					</form>
-
 			{% endfor %}
 			<hr>
 			<p>Leave a Comment</p>

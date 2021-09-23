@@ -19,10 +19,11 @@ from django.views import View
 
 class HomeView(TemplateView):
     template_name = "user-panel/index.html"
-
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
+        post_lists = Post.objects.all()
         context["page_title"] = "Home"
+        context['post_lists'] =post_lists
         return context
 # #-----------------------------***-----------------------------
 # #------------------------ User Profile -----------------------

@@ -1,0 +1,85 @@
+{% load static %}
+{% url 'account_signup' as signup_url %}
+{% url 'account_login' as login_url %}
+{% url 'account_logout' as logout_url %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table, td, th {
+      border: 1px solid black;
+    }
+    table {
+      width: 100%;
+
+      border-collapse: collapse;
+    }
+</style>
+</head>
+<body>
+    <div class="row">
+        <div class="col-12">
+            {% if not request.user.is_authenticated %}
+            <ul class="nav navbar-nav align-items-center ml-auto">
+                <li class="nav-item d-none d-lg-block">
+                    <a href="{{ signup_url }}" class="btn btn-primary btn-md fw-bold">
+                        <i class="fa fa-plus-circle"></i> Signup
+                    </a>
+                </li>
+                <li class="nav-item d-none d-lg-block ml-2">
+                    <a href="{{ login_url }}" class="btn btn-success btn-md fw-bold">
+                        <i class="fa fa-location-arrow"></i> Login
+                    </a>
+                </li>
+            </ul>
+            {% else %}
+            <ul class="nav navbar-nav align-items-center ml-auto">
+                <li class="nav-item dropdown dropdown-user">
+                    <a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="javascript:void(0);"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="user-nav d-sm-flex d-none">
+                            <span class="user-name font-weight-bolder">
+                                {{ request.user.get_dynamic_username }}
+                            </span>
+                            <span class="user-status">
+                                {% if request.user.is_staff == True %}
+                                Admin
+                                {% else %}
+                                Regular User
+                                {% endif %}
+                            </span>
+                        </div>
+                        <span class="avatar">
+                            <img class="round" src="{% static 'assets/images/avatar-s-11.jpg' %}" alt="avatar"
+                                height="40" width="40">
+                            <span class="avatar-status-online"></span>
+                        </span>
+                    </a>
+                     <li class="nav-item d-none d-lg-block ml-2">
+                    <a href="{% url 'home' %}" class="btn btn-success btn-md fw-bold">
+                        <i class="fa fa-location-arrow"></i> Home
+                    </a>
+                    </li>
+                    <li class="nav-item d-none d-lg-block ml-2">
+                    <a href="{% url 'user_profile' %}" class="btn btn-success btn-md fw-bold">
+                        <i class="fa fa-location-arrow"></i> Profile
+                    </a>
+                    </li>
+                    <a class="dropdown-item" href="{{ logout_url }}">
+                        <i class="mr-50" data-feather="power"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+
+
+</body>
+</html>

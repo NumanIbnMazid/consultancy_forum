@@ -3,7 +3,7 @@ from users.models import Husband
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
-from posts.models import Post, Comment, CommentReply
+from posts.models import Post, Comment, CommentReply,Thread
 from django.contrib import messages
 from django.urls import reverse
 from .forms import HusbandManageForm, PostManageForm
@@ -21,9 +21,11 @@ class HomeView(TemplateView):
     template_name = "user-panel/index.html"
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
+        thread_lists = Thread.objects.all()
         post_lists = Post.objects.all()
         context["page_title"] = "Home"
-        context['post_lists'] =post_lists
+        context['page_title'] ='Thread lists'
+        context['thread_lists'] =thread_lists
         return context
 # #-----------------------------***-----------------------------
 # #------------------------ User Profile -----------------------
@@ -33,7 +35,7 @@ class HomeView(TemplateView):
 def user_profile(request):
     page_title = request.user.username
     husband_lists = Husband.objects.filter(user  = request.user)
-    post_lists = Post.objects.all()
+    post_lists = Post.objects.filter(user = request.user)
     context = {'husband_lists':husband_lists,
                'post_lists':post_lists,'page_title':page_title}
     return render(request,'user-panel/profile.html', context)
@@ -203,3 +205,11 @@ def comment_reply(request, id):
 
 
     return render(request, 'user-panel/post-details.html', context)
+
+#
+def post_list(request, slug):
+    thread_qs = Thread.objects.filter(slug = slug).last()
+    post_lists = Post.objects.filter(thread = thread_qs)
+    context = {'page_title':thread_qs.title,
+               'thread_qs':thread_qs, 'post_lists':post_lists}
+    return render(request, 'user-panel/post_list.html', context)

@@ -1,31 +1,17 @@
 {% include 'user-panel/base.html' %}
 {% load custom_tags %}
+
+{% if  request.user.is_authenticated %}
 <center>
-    <h3 style="color:red"><u>Post list</u></h3>
+    <h3 style="color:red"><u>{{ page_title }}</u></h3>
 </center>
 <table>
     <thead>
         <tr>
-            <th> Title</th>
-            <th> Thread</th>
-            <th> weight</th>
-            <th> Description</th>
-            <th>Details</th>
-            <th>Update</th>
-            <th>Delete</th>
+            {% for thread in thread_lists %}
+                <th><a href="{% url 'post_list' thread.slug %}">{{ thread.title }}</a></th>
+            {% endfor %}
         </tr>
     </thead>
-    <tbody>
-    {% for post in post_lists %}
-        <tr>
-            <td>{{ post.title }}</td>
-            <td>{{ post.thread }}</td>
-            <td>{{ post.description|truncate_word:30|safe }}</td>
-            <td>{{ post.weight }}</td>
-            <td><a href="{% url 'post_details' post.slug %}">Details</a></td>
-            <td><a href="{% url 'post_update' post.slug %}">Update</a></td>
-            <td><a href="{% url 'post_delete' post.slug %}">Delete</a></td>
-        </tr>
-    {% endfor %}
-    </tbody>
 </table>
+{% endif %}

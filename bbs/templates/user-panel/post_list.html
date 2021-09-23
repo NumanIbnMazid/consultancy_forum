@@ -1,0 +1,29 @@
+{% include 'user-panel/base.html' %}
+{% load custom_tags %}
+{% if post_lists %}
+<center>
+    <h3 style="color:red"><u>{{ page_title }}</u></h3>
+</center>
+<table>
+    <thead>
+        <tr>
+            <th> Title</th>
+            <th> Thread</th>
+            <th> weight</th>
+            <th> Description</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for post in post_lists %}
+        <tr>
+            <td>{{ post.title }}</td>
+            <td>{{ post.thread }}</td>
+            <td>{{ post.description|truncate_word:30|safe }}</td>
+            <td>{{ post.weight }}</td>
+            <td><a href="{% url 'post_details' post.slug %}">Details</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}

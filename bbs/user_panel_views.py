@@ -3,7 +3,7 @@ from users.models import Husband
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
-from posts.models import Post
+from posts.models import Post, Comment, CommentReply
 from django.contrib import messages
 from django.urls import reverse
 from .forms import HusbandManageForm, PostManageForm
@@ -127,6 +127,20 @@ def post_details(request, slug):
     page_title = post_qs.title
     form = PostManageForm(instance=post_qs)
     context = {'form': form,'post_qs':post_qs,'page_title':page_title}
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            comment = request.POST.get("comment")
+            Comment.objects.create(
+                post=post_qs,
+                commented_by=request.user,
+                comment=comment
+            )
+            return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+        else:
+            return HttpResponseRedirect(reverse("account_login"))
+
+
     return render(request, 'user-panel/post-details.html', context)
 
 # #-----------------------------***-----------------------------

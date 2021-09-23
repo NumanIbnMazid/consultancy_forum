@@ -1,14 +1,5 @@
 {% load static %}
 
-
-<style>
-	.profile-pic{
-		max-width: 200px;
-		max-height:200px;
-		margin: 0 auto;
-		border-radius: 50%;
-	}
-</style>
 <div class="row">
 	<div class="col-md-3">
 		<div class="card card-body">
@@ -22,16 +13,27 @@
 	<div class="col-md-9">
 		<div class="card card-body">
 			<div>
-				<h2>{{ post_qs.title }} | {{ post_qs.thread }} | {{ post_qs.user }}</h2>
+				<h2>{{ post_qs.title }} | {{ post_qs.thread }} | {{ post_qs.user }}|{{ post_qs.created_at|date }}</h2>
 				<p>{{ post_qs.description }}</p>
 			</div>
-
-			<form method="POST" action="" enctype="multipart/form-data">
-				{% csrf_token %}
-				<input type="text">
-				<input class="btn btn-primary" type="submit" name="Update">
+			<h3>Comments ({{ post_qs.post_comments.count }})</h3>
+			{% for comment in post_qs.post_comments.all %}
+			<p>{{ comment.comment }}</p>
+				<form method="POST" action="" enctype="multipart/form-data">
+					{% csrf_token %}
+					<textarea class="form-control" name="comment" rows="3" id="reply"></textarea>
+					<button type="submit">Reply</button>
 
 				</form>
+			{% endfor %}
+			<hr>
+			<p>Leave a Comment</p>
+			<form method="POST" action="" enctype="multipart/form-data">
+				{% csrf_token %}
+				<textarea class="form-control" name="comment" rows="3" id=""></textarea>
+				<button type="submit">Comment</button>
+
+			</form>
 		</div>
 	</div>
 </div>

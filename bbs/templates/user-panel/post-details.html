@@ -14,21 +14,23 @@
 		<div class="card card-body">
 			<a class="btn btn-warning" href="{% url 'user_profile' %}"> &#8592; Back to Profile</a>
 			<hr>
-			<h3 style="text-align: center">Information</h3>
+			<h3 style="text-align: center">{{ page_title }}</h3>
 			<hr>
 
 		</div>
 	</div>
 	<div class="col-md-9">
 		<div class="card card-body">
+			<div>
+				<h2>{{ post_qs.title }} | {{ post_qs.thread }} | {{ post_qs.user }}</h2>
+				<p>{{ post_qs.description }}</p>
+			</div>
 
 			<form method="POST" action="" enctype="multipart/form-data">
 				{% csrf_token %}
-				{{form.as_p}}
-				{% if is_details == True %}
-				{% else %}
+				<input type="text">
 				<input class="btn btn-primary" type="submit" name="Update">
-				{% endif %}
+
 				</form>
 		</div>
 	</div>

@@ -124,10 +124,10 @@ def create_post(request):
 @login_required()
 def post_details(request, slug):
     post_qs = Post.objects.filter(slug=slug).last()
+    page_title = post_qs.title
     form = PostManageForm(instance=post_qs)
-    is_details = True
-    context = {'form': form,'post_qs':post_qs}
-    return render(request, 'user-panel/form.html', context)
+    context = {'form': form,'post_qs':post_qs,'page_title':page_title}
+    return render(request, 'user-panel/post-details.html', context)
 
 # #-----------------------------***-----------------------------
 # #------------------------ Post Update ------------------------

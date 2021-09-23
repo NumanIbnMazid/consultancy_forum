@@ -26,11 +26,18 @@ from .views import (
 
 USER_PANEL_URLS = [
     path("", HomeView.as_view(), name="home"),
+    # -----------------------------*** Husband ***-----------------------------
+    #   -----------------------------*** *** ***-----------------------------
+    path('user_profile/', views.user_profile, name="user_profile"),
+
+    # -----------------------------*** Husband ***-----------------------------
+    #   -----------------------------*** *** ***-----------------------------
     path('create-husband/', views.create_husband, name='create_husband'),
     path('husband-details/<slug>/', views.husband_details, name='husband_details'),
     path('husband-update/<slug>/', views.husband_update, name='husband_update'),
-    path('user_profile/', views.user_profile, name="user_profile"),
 
+    # -----------------------------*** Post ***-----------------------------
+    #   -----------------------------*** *** ***-----------------------------
     path('create-post/', views.create_post, name='create_post'),
     path('post-details/<slug>/', views.post_details, name='post_details'),
     path('post-update/<slug>/', views.post_update, name='post_update'),

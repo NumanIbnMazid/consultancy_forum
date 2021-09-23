@@ -11,6 +11,12 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views import View
 
+
+# #-----------------------------***-----------------------------
+# #---------------------------- Home ---------------------------
+# #-----------------------------***-----------------------------
+
+
 class HomeView(TemplateView):
     template_name = "user-panel/index.html"
 
@@ -18,6 +24,9 @@ class HomeView(TemplateView):
         context = super(HomeView, self).get_context_data(**kwargs)
         context["page_title"] = "Home"
         return context
+# #-----------------------------***-----------------------------
+# #------------------------ User Profile -----------------------
+# #-----------------------------***-----------------------------
 
 @login_required()
 def user_profile(request):
@@ -27,6 +36,10 @@ def user_profile(request):
                'post_lists':post_lists}
     return render(request,'user-panel/profile.html', context)
 
+
+# #-----------------------------***-----------------------------
+# #------------------------ Husband Create ---------------------
+# #-----------------------------***-----------------------------
 @login_required()
 def create_husband(request):
     # template_name = "user-panel/husband.html"
@@ -42,12 +55,18 @@ def create_husband(request):
             characteristics = request.POST.get('characteristics')
             husband_qs = Husband.objects.filter(name__iexact = name).last()
             if not husband_qs:
-                husband_qs = Husband.objects.create(user = user, name = name, nationality = nationality,
-                                   address = address, dob=dob,characteristics=characteristics)
+                husband_qs = Husband.objects.create(user = user, name = name,
+                                                    nationality = nationality,address = address,
+                                                    dob=dob,characteristics=characteristics)
                 if husband_qs:
                     return HttpResponseRedirect(reverse('user_profile'))
     context ={'form':form}
     return render(request, 'user-panel/form.html', context)
+
+
+# #-----------------------------***-----------------------------
+# #------------------------ Husband Details --------------------
+# #-----------------------------***-----------------------------
 
 @login_required()
 def husband_details(request, slug):
@@ -56,6 +75,10 @@ def husband_details(request, slug):
     is_details = True
     context = {'form': form,'is_details':is_details}
     return render(request, 'user-panel/form.html', context)
+
+# #-----------------------------***-----------------------------
+# #------------------------ Husband Update ---------------------
+# #-----------------------------***-----------------------------
 
 @login_required()
 def husband_update(request, slug):
@@ -70,6 +93,9 @@ def husband_update(request, slug):
     context = {'form': form}
     return render(request, 'user-panel/form.html', context)
 
+# #-----------------------------***-----------------------------
+# #------------------------ Create Post ------------------------
+# #-----------------------------***-----------------------------
 
 @login_required()
 def create_post(request):
@@ -90,6 +116,10 @@ def create_post(request):
     context ={'form':form}
     return render(request, 'user-panel/form.html', context)
 
+# #-----------------------------***-----------------------------
+# #------------------------ Post Details ------------------------
+# #-----------------------------***-----------------------------
+
 @login_required()
 def post_details(request, slug):
     post_qs = Post.objects.filter(slug=slug).last()
@@ -97,6 +127,10 @@ def post_details(request, slug):
     is_details = True
     context = {'form': form,'post_qs':post_qs}
     return render(request, 'user-panel/form.html', context)
+
+# #-----------------------------***-----------------------------
+# #------------------------ Post Update ------------------------
+# #-----------------------------***-----------------------------
 
 @login_required()
 def post_update(request, slug):
@@ -109,6 +143,10 @@ def post_update(request, slug):
             return HttpResponseRedirect(reverse('user_profile'))
     context = {'form': form}
     return render(request, 'user-panel/form.html', context)
+
+# #-----------------------------***-----------------------------
+# #------------------------ Post Delete ------------------------
+# #-----------------------------***-----------------------------
 
 @login_required()
 def post_delete(request, slug):

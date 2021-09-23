@@ -4,14 +4,31 @@
 {% if  request.user.is_authenticated %}
 <center>
     <h3 style="color:red"><u>{{ page_title }}</u></h3>
-</center>
+
 <table>
     <thead>
         <tr>
             {% for thread in thread_lists %}
-                <th><a href="{% url 'post_list' thread.slug %}">{{ thread.title }}</a></th>
+                <th><a href="">{{ thread.title }} </a></th>
+                    {% for post in thread.post_threads.all %}
+                        <tr>
+                            <td><a href="{% url 'post_details' post.slug %}">{{ post.title }} </a></td>
+                        </tr>
+                    {% endfor %}
+
             {% endfor %}
+
         </tr>
     </thead>
 </table>
-{% endif %}
+</center>
+
+<!--<ul>-->
+<!--{% for thread in thread_lists %}-->
+<!--<li>|| {{thread}} ||-->
+<!--    {% for post in thread.post_threads.all %}-->
+<!--        <ol>|| {{ post.title }} ||</ol>-->
+<!--    {% endfor %} </li>-->
+<!--{% endfor %}-->
+<!--    </ul>-->
+<!--{% endif %}-->

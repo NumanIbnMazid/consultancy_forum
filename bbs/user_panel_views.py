@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView
-from users.models import Husband
+
+from plans.models import UserWalletTransaction
+from users.models import Husband, UserWallet
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -37,8 +39,10 @@ def user_profile(request):
     page_title = request.user.username
     husband_lists = Husband.objects.filter(user  = request.user)
     post_lists = Post.objects.filter(user = request.user)
+    user_wallet = UserWallet.objects.filter(user = request.user).last()
     context = {'husband_lists':husband_lists,
-               'post_lists':post_lists,'page_title':page_title}
+               'post_lists':post_lists,'page_title':page_title,
+               'user_wallet':user_wallet}
     return render(request,'user-panel/profile.html', context)
 
 
@@ -114,10 +118,34 @@ def create_post(request):
             thread = request.POST.get('thread')
             weight = request.POST.get('weight')
             description = request.POST.get('description')
-            post_qs = Post.objects.create(user = user, title = title, thread_id = thread,
-                               weight = weight, description=description)
-            if post_qs:
-                return HttpResponseRedirect(reverse('user_profile'))
+            user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user).last()
+            # -----***----- For Flat Rate -----***-----
+            if user_wallet_transaction_qs.transaction_type == 0:
+                user_wallet_qs = UserWallet.objects.filter(user = user_wallet_transaction_qs.user)
+                # -----***----- For Post Weight -----***-----
+                if int(weight) > 0:
+                    if int(weight) <= user_wallet_qs.last().available_points:
+                        post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                      weight=weight, description=description)
+                        if post_qs:
+                            return HttpResponseRedirect(reverse('user_profile'))
+                        new_user_available_points = user_wallet_qs.last().available_points - int(weight)
+                        user_wallet_qs.update(available_points = new_user_available_points)
+                    else:
+                        return HttpResponseRedirect(reverse('create_post'))
+                # -----***----- For Post Thread Weight -----***-----
+                else:
+                    thread_points = Post.objects.filter(thread_id = thread).last()
+                    if thread_points.thread.weight <= user_wallet_qs.last().available_points:
+                        post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                      weight=weight, description=description)
+                        new_user_available_points = user_wallet_qs.last().available_points - thread_points.thread.weight
+                        user_wallet_qs.update(available_points=new_user_available_points)
+                        if post_qs:
+                            return HttpResponseRedirect(reverse('user_profile'))
+                    else:
+                        pass
+
     context ={'form':form}
     return render(request, 'user-panel/form.html', context)
 

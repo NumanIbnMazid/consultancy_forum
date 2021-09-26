@@ -20,6 +20,10 @@
         <th>Contact number:</th>
         <td>{{ request.user.contact_number }}</td>
     </tr>
+    <tr>
+        <th>Available Point</th>
+        <td>{{ user_wallet.available_points }}</td>
+    </tr>
 </table>
 
 <a href="{% url 'create_husband' %}"><h4>+ create husband</h4></a>

@@ -13,7 +13,7 @@
 	<div class="col-md-9">
 		<div class="card card-body">
 			<div>
-				<h2>{{ post_qs.title }} | {{ post_qs.thread }} | {{ post_qs.user }}|{{ post_qs.created_at|date }}</h2>
+				<h2 style="color:blue">{{ post_qs.title }} | {{ post_qs.thread }} | {{ post_qs.created_at|date }}</h2>
 				<p>{{ post_qs.description }}</p>
 			</div>
 			<h3>Comments ({{ post_qs.post_comments.count }})</h3>

@@ -10,19 +10,23 @@
 <table>
     <tr>
         <th>Name</th>
-        <td>{{ request.user }}</td>
-    </tr>
-    <tr>
+        <td></td>
         <th>Gender</th>
         <td>{{ request.user.gender }}</td>
     </tr>
      <tr>
         <th>Contact number:</th>
+         {% if request.user.contact_number %}
         <td>{{ request.user.contact_number }}</td>
-    </tr>
-    <tr>
+         {% endif %}
         <th>Available Point</th>
         <td>{{ user_wallet.available_points }}</td>
+    </tr>
+    <tr>
+        <th>Flat Plan:</th>
+        <td>{{ user_wallet.is_in_flat_plan }}</td>
+        <th>Flat Plan create at</th>
+        <td>{{ user_wallet.flat_plan_created_at.date }}</td>
     </tr>
 </table>
 

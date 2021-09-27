@@ -12,7 +12,8 @@ from .forms import HusbandManageForm, PostManageForm
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views import View
-
+from datetime import date, datetime, timedelta
+from django.utils import timezone
 
 # #-----------------------------***-----------------------------
 # #---------------------------- Home ---------------------------
@@ -116,23 +117,24 @@ def create_post(request):
             user = request.user
             title = request.POST.get('title')
             thread = request.POST.get('thread')
-            weight = request.POST.get('weight')
+            weight = int(request.POST.get('weight'))
             description = request.POST.get('description')
             user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user).last()
+            user_wallet_qs = UserWallet.objects.filter(user=user_wallet_transaction_qs.user)
+
             # -----***----- For Flat Rate -----***-----
-            if user_wallet_transaction_qs.transaction_type == 0:
-                user_wallet_qs = UserWallet.objects.filter(user = user_wallet_transaction_qs.user)
+            if not user_wallet_transaction_qs.transaction_type == 1:
                 # -----***----- For Post Weight -----***-----
-                if int(weight) > 0:
-                    if int(weight) <= user_wallet_qs.last().available_points:
+                if weight > 0:
+                    if weight <= user_wallet_qs.last().available_points:
                         post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
                                                       weight=weight, description=description)
-                        if post_qs:
-                            return HttpResponseRedirect(reverse('user_profile'))
                         new_user_available_points = user_wallet_qs.last().available_points - int(weight)
                         user_wallet_qs.update(available_points = new_user_available_points)
-                    else:
-                        return HttpResponseRedirect(reverse('create_post'))
+                        if post_qs:
+                            return HttpResponseRedirect(reverse('user_profile'))
+
+
                 # -----***----- For Post Thread Weight -----***-----
                 else:
                     thread_points = Post.objects.filter(thread_id = thread).last()
@@ -144,7 +146,119 @@ def create_post(request):
                         if post_qs:
                             return HttpResponseRedirect(reverse('user_profile'))
                     else:
-                        pass
+                        return HttpResponseRedirect(reverse('create_post'))
+            # -----***----- For Point Rate -----***-----
+            else:
+                is_flat_rate_plan = user_wallet_qs.last().is_in_flat_plan
+                if not is_flat_rate_plan:
+                    # available_points = user_wallet_qs.last().available_points
+                    if weight > 0:
+                        if weight <= user_wallet_qs.last().available_points:
+                            post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                          weight=weight, description=description)
+                            new_user_available_points = user_wallet_qs.last().available_points - int(weight)
+                            user_wallet_qs.update(available_points=new_user_available_points)
+                            if post_qs:
+                                return HttpResponseRedirect(reverse('user_profile'))
+
+                    # -----***----- For Post Thread Weight -----***-----
+                    else:
+                        thread_points = Post.objects.filter(thread_id=thread).last()
+                        if thread_points.thread.weight <= user_wallet_qs.last().available_points:
+                            post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                          weight=weight, description=description)
+                            new_user_available_points = user_wallet_qs.last().available_points - thread_points.thread.weight
+                            user_wallet_qs.update(available_points=new_user_available_points)
+                            if post_qs:
+                                return HttpResponseRedirect(reverse('user_profile'))
+                        else:
+                            return HttpResponseRedirect(reverse('create_post'))
+
+                else:
+                    today = timezone.datetime.now().date()
+                    # start_date = today - timedelta(days=1)
+                    x = user_wallet_qs.last().flat_plan_created_at
+                    y = user_wallet_transaction_qs.flat_rate_plan
+                    days = today - x.date()
+                    expiration_cycle = y.expiration_cycle
+                    if expiration_cycle == 0:
+                        if days.days < 31:
+                            if weight > 0:
+                                if weight <= user_wallet_qs.last().available_points:
+                                    post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                                  weight=weight, description=description)
+                                    new_user_available_points = user_wallet_qs.last().available_points - int(weight)
+                                    user_wallet_qs.update(available_points=new_user_available_points)
+                                    if post_qs:
+                                        return HttpResponseRedirect(reverse('user_profile'))
+
+                            # -----***----- For Post Thread Weight -----***-----
+                            else:
+                                thread_points = Post.objects.filter(thread_id=thread).last()
+                                if thread_points.thread.weight <= user_wallet_qs.last().available_points:
+                                    post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                                  weight=weight, description=description)
+                                    new_user_available_points = user_wallet_qs.last().available_points - thread_points.thread.weight
+                                    user_wallet_qs.update(available_points=new_user_available_points)
+                                    if post_qs:
+                                        return HttpResponseRedirect(reverse('user_profile'))
+                                else:
+                                    return HttpResponseRedirect(reverse('create_post'))
+
+                        else:
+                            user_wallet_qs.update(is_in_flat_plan = False,
+                                                  flat_plan_created_at=None)
+                    elif expiration_cycle == 1:
+                        if days.days < 366:
+                            if weight > 0:
+                                if weight <= user_wallet_qs.last().available_points:
+                                    post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                                  weight=weight, description=description)
+                                    new_user_available_points = user_wallet_qs.last().available_points - int(weight)
+                                    user_wallet_qs.update(available_points=new_user_available_points)
+                                    if post_qs:
+                                        return HttpResponseRedirect(reverse('user_profile'))
+
+                            # -----***----- For Post Thread Weight -----***-----
+                            else:
+                                thread_points = Post.objects.filter(thread_id=thread).last()
+                                if thread_points.thread.weight <= user_wallet_qs.last().available_points:
+                                    post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                                  weight=weight, description=description)
+                                    new_user_available_points = user_wallet_qs.last().available_points - thread_points.thread.weight
+                                    user_wallet_qs.update(available_points=new_user_available_points)
+                                    if post_qs:
+                                        return HttpResponseRedirect(reverse('user_profile'))
+                                else:
+                                    return HttpResponseRedirect(reverse('create_post'))
+
+                        else:
+                            user_wallet_qs.update(is_in_flat_plan = False,
+                                                  flat_plan_created_at=None)
+                    else:
+                        if weight > 0:
+                            if weight <= user_wallet_qs.last().available_points:
+                                post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                              weight=weight, description=description)
+                                new_user_available_points = user_wallet_qs.last().available_points - int(weight)
+                                user_wallet_qs.update(available_points=new_user_available_points)
+                                if post_qs:
+                                    return HttpResponseRedirect(reverse('user_profile'))
+
+                        # -----***----- For Post Thread Weight -----***-----
+                        else:
+                            thread_points = Post.objects.filter(thread_id=thread).last()
+                            if thread_points.thread.weight <= user_wallet_qs.last().available_points:
+                                post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+                                                              weight=weight, description=description)
+                                new_user_available_points = user_wallet_qs.last().available_points - thread_points.thread.weight
+                                user_wallet_qs.update(available_points=new_user_available_points)
+                                if post_qs:
+                                    return HttpResponseRedirect(reverse('user_profile'))
+                            else:
+                                return HttpResponseRedirect(reverse('create_post'))
+                    print('test')
+
 
     context ={'form':form}
     return render(request, 'user-panel/form.html', context)

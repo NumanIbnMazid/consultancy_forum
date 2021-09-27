@@ -41,9 +41,11 @@ def user_profile(request):
     husband_lists = Husband.objects.filter(user  = request.user)
     post_lists = Post.objects.filter(user = request.user)
     user_wallet = UserWallet.objects.filter(user = request.user).last()
+    user_wallet_transaction = UserWalletTransaction.objects.filter(user = request.user).last()
     context = {'husband_lists':husband_lists,
                'post_lists':post_lists,'page_title':page_title,
-               'user_wallet':user_wallet}
+               'user_wallet':user_wallet,'user_wallet_transaction':
+               user_wallet_transaction}
     return render(request,'user-panel/profile.html', context)
 
 

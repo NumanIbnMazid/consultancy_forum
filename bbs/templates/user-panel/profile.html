@@ -34,18 +34,18 @@
         <th>Transaction Type:</th>
         {% if user_wallet_transaction.transaction_type == 0 %}
         <td><b>Point</b></td>
-        {% elif user_wallet_transaction.transaction_type == 2 %}
+        {% elif user_wallet_transaction.transaction_type == 1 %}
         <td><b>Flat Rate</b></td>
         {% else %}
         <td><b>--</b></td>
         {% endif %}
 
         <th>Flat Plan</th>
-        {% if user_wallet_transaction.point_plan.expiration_cycle == 0 %}
+        {% if user_wallet_transaction.flat_rate_plan.expiration_cycle == 0 %}
         <td><b>Monthly</b></td>
-        {% elif user_wallet_transaction.point_plan__expiration_cycle == 1 %}
+        {% elif user_wallet_transaction.flat_rate_plan.expiration_cycle == 1 %}
         <td><b>Yearly</b></td>
-        {% elif user_wallet_transaction.point_plan__expiration_cycle == 2 %}
+        {% elif user_wallet_transaction.flat_rate_plan.expiration_cycle == 2 %}
         <td><b>Monthly</b></td>
         {% else %}
         <td><b>--</b></td>

@@ -43,7 +43,7 @@ class PostManageForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = '__all__'
-        exclude = ['slug','user']
+        exclude = ['slug','user','weight']
 
         widgets = {
             'description': CKEditorWidget(),

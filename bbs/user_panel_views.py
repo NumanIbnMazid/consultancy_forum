@@ -31,6 +31,36 @@ class HomeView(TemplateView):
         context['thread_lists'] =thread_lists
         context['post_lists'] =post_lists
         return context
+
+# #-----------------------------***-----------------------------
+# #------------------------ User Available Point -----------------------
+# #-----------------------------***-----------------------------
+def check_available_point(request, user_qs):
+    if user_qs:
+        user_wallet_qs = UserWallet.objects.filter(user_id = user_qs).order_by('created_at').last()
+        if user_wallet_qs:
+            user_available_points = user_wallet_qs.available_points
+            return user_available_points
+        else:
+            return False
+    else:
+        return False
+
+
+def check_user_transaction_type(request,post_qs, user_wallet_transaction_qs, user_wallet_qs):
+    if not post_qs:
+        return False
+    if user_wallet_transaction_qs.transaction_type == 1:
+        is_flat_rate_plan = user_wallet_qs.first().is_in_flat_plan
+        if not is_flat_rate_plan:
+            return True
+        today = timezone.datetime.now().date()
+        flat_plan_created_date = user_wallet_qs.first().flat_plan_created_at
+        flat_rate_plan_qs = user_wallet_transaction_qs.flat_rate_plan
+        days = today - flat_plan_created_date.date()
+        expiration_cycle = flat_rate_plan_qs.expiration_cycle
+
+    return True
 # #-----------------------------***-----------------------------
 # #------------------------ User Profile -----------------------
 # #-----------------------------***-----------------------------
@@ -117,12 +147,6 @@ def husband_update(request, slug):
     context = {'form': form}
     return render(request, 'user-panel/form.html', context)
 
-# #-----------------------------***-----------------------------
-# #------------------------ Create Post ------------------------
-# #-----------------------------***-----------------------------
-
-# @login_required()
-# def create_post(request):
 
 # #----------------------------------------****----------------------------------------
 # #------------------------------------- Post Create --------------------------------------
@@ -244,21 +268,39 @@ def create_post(request):
 
 @login_required()
 def post_details(request, slug):
-    post_qs = Post.objects.filter(slug=slug).last()
+    post_qs = Post.objects.filter(slug=slug).order_by('created_at').last()
     page_title = post_qs.title
     form = PostManageForm(instance=post_qs)
-    context = {'form': form,'post_qs':post_qs,'page_title':page_title}
+    available_point = check_available_point(request, post_qs.user_id)
+    if post_qs.weight > 0:
+        post_weight = post_qs.weight
+    else:
+        post_weight = post_qs.thread.weight
+
+    user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user=request.user).order_by('created_at').last()
+    if not user_wallet_transaction_qs:
+        return False
+    user_wallet_qs = UserWallet.objects.filter(user=user_wallet_transaction_qs.user).order_by('created_at')
+    if not user_wallet_qs:
+        return False
+
+    check_user_transaction_type(request,post_qs, user_wallet_transaction_qs, user_wallet_qs)
+
+    context = {'form': form,'post_qs':post_qs,'page_title':page_title,
+               'available_point':available_point,
+               'post_weight':post_weight}
 
     if request.method == 'POST':
         if request.user.is_authenticated:
             comment = request.POST.get("comment")
-            if comment:
-                Comment.objects.create(
-                    post=post_qs,
-                    commented_by=request.user,
-                    comment=comment
-                )
-            return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+            if available_point:
+                if comment:
+                    Comment.objects.create(
+                        post=post_qs,
+                        commented_by=request.user,
+                        comment=comment
+                    )
+                return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
         else:
             return HttpResponseRedirect(reverse("account_login"))
 

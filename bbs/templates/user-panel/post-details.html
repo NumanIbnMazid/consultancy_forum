@@ -1,4 +1,6 @@
 {% load static %}
+{% load custom_tags %}
+{% include 'user-panel/base.html' %}
 
 <div class="row">
 	<div class="col-md-3">
@@ -14,7 +16,17 @@
 		<div class="card card-body">
 			<div>
 				<h2 style="color:blue">{{ post_qs.title }} | {{ post_qs.thread }} | {{ post_qs.created_at|date }}</h2>
+				{% if post_qs.thread.weight == 0 or post_qs.weight == 0 %}
 				<p>{{ post_qs.description|safe }}</p>
+				{% else %}
+				<p>{{ post_qs.description|truncate_fifty_percent_word|safe }}</p>
+				<button> Read More </button>
+				{% if available_point > post_weight %}
+					<p>{{ post_qs.description|safe }}</p>
+				{% else %}
+				<p><h3>Please Update Your Wallet</h3></p>
+				{% endif %}
+				{% endif %}
 			</div>
 			<h3>Comments ({{ post_qs.post_comments.count }})</h3>
 			{% for comment in post_qs.post_comments.all %}

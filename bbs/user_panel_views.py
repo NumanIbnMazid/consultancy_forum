@@ -1,14 +1,14 @@
 from django.views.generic import TemplateView
 
 from plans.models import UserWalletTransaction
-from users.models import Husband, UserWallet
+from users.models import Husband, UserWallet, User
 from django.http import HttpResponse, HttpResponseNotFound
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from posts.models import Post, Comment, CommentReply,Thread
 from django.contrib import messages
 from django.urls import reverse
-from .forms import HusbandManageForm, PostManageForm
+from .forms import HusbandManageForm, PostManageForm, UserManageForm
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views import View
@@ -48,7 +48,19 @@ def user_profile(request):
                user_wallet_transaction}
     return render(request,'user-panel/profile.html', context)
 
-
+# #-----------------------------***-----------------------------
+# #------------------------ Profile Update-----------------------
+# #-----------------------------***-----------------------------
+def user_profile_update(request, slug):
+    user_qs = User.objects.filter(slug = slug).order_by('date_joined').last()
+    form = UserManageForm(instance=user_qs)
+    if request.method == 'POST':
+        form = UserManageForm(request.POST,instance=user_qs)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('user_profile'))
+    context = {'form': form}
+    return render(request, 'user-panel/form.html', context)
 # #-----------------------------***-----------------------------
 # #------------------------ Husband Create ---------------------
 # #-----------------------------***-----------------------------
@@ -96,7 +108,7 @@ def husband_details(request, slug):
 def husband_update(request, slug):
     husband_qs = Husband.objects.filter(slug=slug).last()
     form = HusbandManageForm(instance=husband_qs)
-    url = request.path
+    # url = request.path
     if request.method == 'POST':
         form = HusbandManageForm(request.POST,instance=husband_qs)
         if form.is_valid():
@@ -112,55 +124,56 @@ def husband_update(request, slug):
 # @login_required()
 # def create_post(request):
 
+# #----------------------------------------****----------------------------------------
+# #------------------------------------- Post Create --------------------------------------
+# #----------------------------------------****----------------------------------------
 
-def add_post(request, user, title, thread, weight, description,user_wallet_qs, form):
-    if weight > 0:
-        if weight <= user_wallet_qs.first().available_points:
-            post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
-                                          weight=weight, description=description)
-            new_user_available_points = user_wallet_qs.first().available_points - int(weight)
-            user_wallet_qs.update(available_points=new_user_available_points)
-            if post_qs:
-                return post_qs
-        else:
-            return HttpResponseRedirect(reverse('create_post'))
-
-    # -----***----- For Post Thread Weight -----***-----
+def add_post(request, user, title, thread, weight, description,user_wallet_qs):
+    if weight <= user_wallet_qs.first().available_points:
+        Post.objects.create(user=user, title=title, thread_id=thread,
+                                      description=description)
+        new_user_available_points = user_wallet_qs.first().available_points - weight
+        user_wallet_qs.update(available_points=new_user_available_points)
+        return True
     else:
-        thread_points = Thread.objects.filter(id=thread).first()
-        if thread_points:
-            new_weight = thread_points.weight
-            if thread_points.weight <= user_wallet_qs.first().available_points:
-                post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
-                                              weight=new_weight, description=description)
-                new_user_available_points = user_wallet_qs.first().available_points - thread_points.weight
-                user_wallet_qs.update(available_points=new_user_available_points)
-                if post_qs:
-                    return post_qs
-            else:
-                return HttpResponseRedirect(reverse('create_post'))
-        else:
-            return HttpResponseNotFound('<h4> Thread Not Fund </h4>')
-# post_qs = add_post(request, user, title, thread, weight, description,user_wallet_qs, form)
-#                         if post_qs:
-#                             return HttpResponseRedirect(reverse('user_profile'))
+        return False
 
+    # if weight > 0:
+    #     if weight <= user_wallet_qs.first().available_points:
+    #         post_qs = Post.objects.create(user=user, title=title, thread_id=thread,
+    #                                       weight=weight, description=description)
+    #         new_user_available_points = user_wallet_qs.first().available_points - int(weight)
+    #         user_wallet_qs.update(available_points=new_user_available_points)
+    #         if post_qs:
+    #             return post_qs
+    #     else:
+    #         return HttpResponseRedirect(reverse('create_post'))
+    #
+    # # -----***----- For Post Thread Weight -----***-----
+    # else:
+    #     # thread_points = Thread.objects.filter(id=thread).first()
+
+
+# #----------------------------------------****----------------------------------------
+# #--------------------------------------- Post ----------------------------------------
+# #----------------------------------------****----------------------------------------
 @login_required()
 def create_post(request):
-# template_name = "user-panel/husband.html"
-    form = PostManageForm
 
+# template_name = "user-panel/husband.html"
+
+    form = PostManageForm
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = request.user
             title = request.POST.get('title')
             thread = request.POST.get('thread')
-            weight = int(request.POST.get('weight'))
             description = request.POST.get('description')
-            # check_func(request)
-            user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user).first()
+            thread_weight_qs = Thread.objects.filter(id=thread).order_by('-created_at').first()
+            weight = thread_weight_qs.weight
+            user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user).order_by('-created_at').first()
             if user_wallet_transaction_qs:
-                user_wallet_qs = UserWallet.objects.filter(user=user_wallet_transaction_qs.user)
+                user_wallet_qs = UserWallet.objects.filter(user=user_wallet_transaction_qs.user).order_by('-created_at')
                 if user_wallet_qs:
                     # -----***----- For Flat Rate -----***-----
                     if not user_wallet_transaction_qs.transaction_type == 1:

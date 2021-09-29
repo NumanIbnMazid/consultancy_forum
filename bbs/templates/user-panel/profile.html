@@ -4,17 +4,16 @@
 
 
 <center>
-    <h3 style="color:red"><u>{{ page_title  }} Profile</u></h3>
+    <h3 style="color:red"><u>{{ request.user.name }} Profile</u></h3>
 
 </center>
+<a href="{% url 'user_profile_update' request.user.slug %}"><h4>Update Profile</h4></a>
 <table>
     <tr>
         <th>Name</th>
-        <td></td>
+        <td>{{ request.user.name }}</td>
         <th>Gender</th>
-        <td>{{ request.user.gender }}</td>
-    </tr>
-     <tr>
+        <td>{{ request.user.get_gender_display }}</td>
         <th>Contact number:</th>
          {% if request.user.contact_number %}
         <td>{{ request.user.contact_number }}</td>
@@ -25,31 +24,21 @@
         <td>{{ user_wallet.available_points }}</td>
     </tr>
     <tr>
-        <th>Flat Plan:</th>
-        <td>{{ user_wallet.is_in_flat_plan }}</td>
+        <th>Address:</th>
+        <td>{{ request.user.address|truncate_fifty_percent_word|safe }}sssssssss</td>
+        <th>Membership Type:</th>
+        <td>{{ request.user.get_membership_type_display }}</td>
         <th>Flat Plan create at</th>
         <td>{{ user_wallet.flat_plan_created_at.date }}</td>
+        <th>Point Plan</th>
+        <td>{{ user_wallet_transaction.point_plan }}</td>
     </tr>
     <tr>
         <th>Transaction Type:</th>
-        {% if user_wallet_transaction.transaction_type == 0 %}
-        <td><b>Point</b></td>
-        {% elif user_wallet_transaction.transaction_type == 1 %}
-        <td><b>Flat Rate</b></td>
-        {% else %}
-        <td><b>--</b></td>
-        {% endif %}
+        <th>{{ user_wallet_transaction.get_transaction_type_str }}</th>
 
         <th>Flat Plan</th>
-        {% if user_wallet_transaction.flat_rate_plan.expiration_cycle == 0 %}
-        <td><b>Monthly</b></td>
-        {% elif user_wallet_transaction.flat_rate_plan.expiration_cycle == 1 %}
-        <td><b>Yearly</b></td>
-        {% elif user_wallet_transaction.flat_rate_plan.expiration_cycle == 2 %}
-        <td><b>Monthly</b></td>
-        {% else %}
-        <td><b>--</b></td>
-        {% endif %}
+        <th>{{ user_wallet_transaction.flat_rate_plan.get_expiration_cycle_str }}</th>
     </tr>
 </table>
 
@@ -89,7 +78,7 @@
 <center>
     <h3 style="color:red"><u>Post</u></h3>
 </center>
-<table>
+<table style="text-align:center">
     <thead>
         <tr>
             <th> Title</th>

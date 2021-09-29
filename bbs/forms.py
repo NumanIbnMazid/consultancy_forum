@@ -1,8 +1,28 @@
 from django import forms
-from users.models import Husband
+from users.models import Husband, User
 from posts.models import Post
 from ckeditor.widgets import CKEditorWidget
 
+# # -------------------------------------------------------------------
+# #                              User
+# # -------------------------------------------------------------------
+class UserManageForm(forms.ModelForm):
+    GENDER_CHOICES = (
+        ('', '--- Select Gender ---'),
+        (0, 'Male'),
+        (1, 'Female'),
+        (2, 'Other'),
+    )
+    def __init__(self, *args, **kwargs):
+        super(UserManageForm, self).__init__(*args, **kwargs)
+    gender = forms.ChoiceField(
+        choices=GENDER_CHOICES, label="Gender", initial='',
+        widget=forms.Select(), required=True
+    )
+    class Meta:
+        model = User
+        fields = ['name','gender','contact_number','dob',
+                 'address','marriage_experience','purpose_of_use']
 
 # # -------------------------------------------------------------------
 # #                              Husband

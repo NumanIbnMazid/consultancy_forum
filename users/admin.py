@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User, UserWallet, Husband
+from .models import User, UserWallet, Husband,UserCostTransaction
 
 
 class UserAdmin(BaseUserAdmin):
@@ -53,3 +53,10 @@ class HusbandAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Husband, HusbandAdmin)
+
+class UserCostTransactionAdmin(admin.ModelAdmin):
+    class Meta:
+        model = UserCostTransaction
+
+
+admin.site.register(UserCostTransaction, UserCostTransactionAdmin)

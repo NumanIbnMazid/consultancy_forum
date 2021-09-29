@@ -233,6 +233,27 @@ class Husband(models.Model):
         return [get_dynamic_fields(field, self) for field in self.__class__._meta.fields]
 
 
+class UserCostTransaction(models.Model):
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="user_cost_transaction_users"
+    )
+    post = models.ForeignKey(to='posts.Post', on_delete=models.CASCADE, related_name='user_cost_transaction_posts',
+                             )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='created at'
+    )
+
+    class Meta:
+        verbose_name = ("User Cost Transaction")
+        verbose_name_plural = ("User Cost Transactions")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.get_dynamic_username()
+
+    def get_fields(self):
+        return [get_dynamic_fields(field, self) for field in self.__class__._meta.fields]
+
 
 def husband_slug_pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:

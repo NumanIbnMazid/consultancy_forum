@@ -26,9 +26,10 @@ from .views import (
 
 USER_PANEL_URLS = [
     path("", HomeView.as_view(), name="home"),
-    # -----------------------------*** Husband ***-----------------------------
+    # -----------------------------*** User ***-----------------------------
     #   -----------------------------*** *** ***-----------------------------
-    path('user_profile/', views.user_profile, name="user_profile"),
+    path('user-profile/', views.user_profile, name="user_profile"),
+    path('user-profile-update/<slug>/', views.user_profile_update, name="user_profile_update"),
 
     # -----------------------------*** Husband ***-----------------------------
     #   -----------------------------*** *** ***-----------------------------

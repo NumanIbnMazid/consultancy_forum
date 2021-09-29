@@ -24,6 +24,12 @@ def truncate_word(value, numWords):
     else:
         return "--"
 
+@register.filter
+def truncate_fifty_percent_word(value):
+    if value:
+        return value[:int(len(value)/2)] + " ..."
+    else:
+        return "--"
 
 @register.filter
 def remove_html_tags(text):

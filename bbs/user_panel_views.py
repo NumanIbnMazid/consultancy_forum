@@ -59,6 +59,16 @@ def check_user_transaction_type(request,post_qs, user_wallet_transaction_qs, use
         flat_rate_plan_qs = user_wallet_transaction_qs.flat_rate_plan
         days = today - flat_plan_created_date.date()
         expiration_cycle = flat_rate_plan_qs.expiration_cycle
+        if expiration_cycle == 0:
+            if days.days <31:
+                return True
+        elif expiration_cycle == 1:
+            if days.days < 366:
+                return True
+        elif expiration_cycle == 2:
+            return True
+        else:
+            return False
 
     return True
 # #-----------------------------***-----------------------------

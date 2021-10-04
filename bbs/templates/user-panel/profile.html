@@ -25,7 +25,7 @@
     </tr>
     <tr>
         <th>Address:</th>
-        <td>{{ request.user.address|truncate_fifty_percent_word|safe }}sssssssss</td>
+        <td>{{ request.user.address|truncate_fifty_percent_word|safe }}</td>
         <th>Membership Type:</th>
         <td>{{ request.user.get_membership_type_display }}</td>
         <th>Flat Plan create at</th>

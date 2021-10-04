@@ -60,7 +60,7 @@ def check_user_transaction_type(request,post_qs, user_wallet_transaction_qs, use
         days = today - flat_plan_created_date.date()
         expiration_cycle = flat_rate_plan_qs.expiration_cycle
         if expiration_cycle == 0:
-            if days.days <31:
+            if days.days < 31:
                 return True
         elif expiration_cycle == 1:
             if days.days < 366:
@@ -69,8 +69,16 @@ def check_user_transaction_type(request,post_qs, user_wallet_transaction_qs, use
             return True
         else:
             return False
+    else:
+        return True
 
+def user_wallet_update(user_wallet_qs, post_weight):
+    if user_wallet_qs and post_weight:
+        new_user_available_points = user_wallet_qs.first().available_points - post_weight
+        user_wallet_qs.update(available_points=new_user_available_points)
     return True
+
+
 # #-----------------------------***-----------------------------
 # #------------------------ User Profile -----------------------
 # #-----------------------------***-----------------------------
@@ -213,7 +221,7 @@ def create_post(request):
                     if not user_wallet_transaction_qs.transaction_type == 1:
                         # -----***----- For Post Weight -----***-----
                         # check_func(request, weight,user_wallet_qs, user,title, thread, weight, description,)
-                        post_qs = add_post(request, user, title, thread, weight, description,user_wallet_qs, form)
+                        post_qs = add_post(request, user, title, thread, weight, description,user_wallet_qs)
                         if post_qs:
                             return HttpResponseRedirect(reverse('user_profile'))
                         else:
@@ -222,7 +230,7 @@ def create_post(request):
                     else:
                         is_flat_rate_plan = user_wallet_qs.first().is_in_flat_plan
                         if not is_flat_rate_plan:
-                            post_qs = add_post(request, user, title, thread, weight, description, user_wallet_qs, form)
+                            post_qs = add_post(request, user, title, thread, weight, description, user_wallet_qs)
                             if post_qs:
                                 return HttpResponseRedirect(reverse('user_profile'))
                             else:
@@ -244,12 +252,12 @@ def create_post(request):
                                         return HttpResponseRedirect(reverse('create_post'))
 
                                 else:
-                                    user_wallet_qs.update(is_in_flat_plan = False,
+                                    user_wallet_qs.update(is_post_detailsin_flat_plan = False,
                                                           flat_plan_created_at=None)
                             elif expiration_cycle == 1:
                                 if days.days < 366:
                                     post_qs = add_post(request, user, title, thread, weight, description,
-                                                       user_wallet_qs, form)
+                                                       user_wallet_qs)
                                     if post_qs:
                                         return HttpResponseRedirect(reverse('user_profile'))
                                     else:
@@ -258,8 +266,8 @@ def create_post(request):
                                     user_wallet_qs.update(is_in_flat_plan = False,
                                                           flat_plan_created_at=None)
                             else:
-                                post_qs = add_post(request, user, title, thread, weight, description, user_wallet_qs,
-                                                   form)
+                                post_qs = add_post(request, user, title, thread, weight, description, user_wallet_qs
+                                                   )
                                 if post_qs:
                                     return HttpResponseRedirect(reverse('user_profile'))
                                 else:
@@ -282,6 +290,7 @@ def post_details(request, slug):
     page_title = post_qs.title
     form = PostManageForm(instance=post_qs)
     available_point = check_available_point(request, post_qs.user_id)
+
     if post_qs.weight > 0:
         post_weight = post_qs.weight
     else:
@@ -289,31 +298,36 @@ def post_details(request, slug):
 
     user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user=request.user).order_by('created_at').last()
     if not user_wallet_transaction_qs:
-        return False
+        return HttpResponseNotFound('<h3> user wallet transaction not found</h3>')
     user_wallet_qs = UserWallet.objects.filter(user=user_wallet_transaction_qs.user).order_by('created_at')
     if not user_wallet_qs:
-        return False
+        return HttpResponseNotFound('<h3> user wallet not found</h3>')
 
-    check_user_transaction_type(request,post_qs, user_wallet_transaction_qs, user_wallet_qs)
+    transaction_type = check_user_transaction_type(request,post_qs, user_wallet_transaction_qs, user_wallet_qs)
+    if not transaction_type:
+        return HttpResponseNotFound('<h3> Return False</h3>')
 
     context = {'form': form,'post_qs':post_qs,'page_title':page_title,
                'available_point':available_point,
                'post_weight':post_weight}
 
-    if request.method == 'POST':
-        if request.user.is_authenticated:
-            comment = request.POST.get("comment")
-            if available_point:
+    if post_weight <= available_point:
+        if request.method == 'POST':
+            if request.user.is_authenticated:
+                comment = request.POST.get("comment")
                 if comment:
                     Comment.objects.create(
                         post=post_qs,
                         commented_by=request.user,
                         comment=comment
                     )
+                    # -------------- User Wallet Update --------------
+                    user_wallet_update(user_wallet_qs, post_weight)
                 return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
-        else:
-            return HttpResponseRedirect(reverse("account_login"))
-
+            else:
+                return HttpResponseRedirect(reverse("account_login"))
+    else:
+        return HttpResponseNotFound('<h3> User Does not available points</h3>')
 
     return render(request, 'user-panel/post-details.html', context)
 

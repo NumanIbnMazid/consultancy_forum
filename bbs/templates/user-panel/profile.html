@@ -84,7 +84,8 @@
             <th> Title</th>
             <th> Thread</th>
             <th> Description</th>
-            <th> weight</th>
+            <th> Post weight</th>
+            <th> Thread weight</th>
             <th>Details</th>
             <th>Update</th>
             <th>Delete</th>
@@ -97,6 +98,7 @@
             <td>{{ post.thread }}</td>
             <td>{{ post.description|truncate_word:30|safe }}</td>
             <td>{{ post.weight }}</td>
+            <td>{{ post.thread.weight }}</td>
             <td><a href="{% url 'post_details' post.slug %}">Details</a></td>
             <td><a href="{% url 'post_update' post.slug %}">Update</a></td>
             <td><a href="{% url 'post_delete' post.slug %}">Delete</a></td>

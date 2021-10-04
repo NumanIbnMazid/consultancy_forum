@@ -80,6 +80,7 @@ def check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet
             #             )
             #         )
             #         return 0
+            return False
     else:
         return 'point_transaction_type'
 

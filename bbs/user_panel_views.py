@@ -84,6 +84,12 @@ def check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet
 # #-----------------------------***-----------------------------
 
 def user_wallet_checking(request, post_qs, user_qs):
+    """
+    :param request:
+    :param post_qs: (Post Model)
+    :param user_qs: (request user)
+    :return: (list)
+    """
     if not post_qs:
         return HttpResponseNotFound('<h3> Post not found </h3>')
     user_wallet_qs = UserWallet.objects.filter(user_id = user_qs).order_by('created_at')
@@ -99,12 +105,10 @@ def user_wallet_checking(request, post_qs, user_qs):
     user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user=user_wallet_qs.last().user).order_by('created_at').last()
     if not user_wallet_transaction_qs:
         messages.error(request,'User Wallet Transaction not found')
-        # return HttpResponseNotFound('<h3> User Wallet Transaction not found </h3>')
 
     transaction_type = check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs)
     if not transaction_type:
-        messages.error(request, 'User Wallet Transaction not found')
-        # return HttpResponseNotFound('<h3> Transaction Type Not Found </h3>')
+        messages.error(request, 'User Wallet Transaction not found, ')
 
     context = {'user_wallet_qs':user_wallet_qs,
                'user_available_points':user_available_points,
@@ -118,11 +122,14 @@ def user_wallet_checking(request, post_qs, user_qs):
 # #-----------------------------***-----------------------------
 
 def user_wallet_update(request, user_wallet_qs, post_weight):
+    """
+    :param request:
+    :param user_wallet_qs:(UserWallet Model)
+    :param post_weight:(int)
+    :return:bool
+    """
     if user_wallet_qs and post_weight:
         new_user_available_points = user_wallet_qs.last().available_points - post_weight
-        # if new_user_available_points < 0:
-        #     messages.error(request, 'You have not Available Points, Please update Your Wallet')
-        #     return True
         user_wallet_qs.update(available_points=new_user_available_points)
     return True
 
@@ -279,7 +286,6 @@ def post_details(request, slug):
 
     if not post_weight == 0:
         # .............***.............User Wallet Checking .............***.............
-
         user_wallet = user_wallet_checking(request, post_qs, user_qs)
         user_available_points = user_wallet.get('user_available_points')
         user_wallet_qs = user_wallet.get('user_wallet_qs')
@@ -287,7 +293,7 @@ def post_details(request, slug):
         if user_wallet.get('user_wallet_transaction_qs').transaction_type == 0:  # Only Check When Transaction Type is Point
             if not post_weight <= user_available_points:
                 messages.error(request, 'User Does not Available Points')
-                return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+                return HttpResponseRedirect(reverse('user_profile'))
 
 
     context = {'form': form,'post_qs':post_qs,'page_title':page_title,

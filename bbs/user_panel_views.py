@@ -389,7 +389,7 @@ def comment_reply(request, id):
                     'user_wallet_transaction_qs').transaction_type == 0:  # Only Check When Transaction Type is Point
                 if not post_weight <= user_available_points:
                     messages.error(request, 'User Does not Available Points')
-                    return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+                    return HttpResponseRedirect(reverse('user_profile'))
 
         context = {'form': form,'post_qs':post_qs,'page_title':page_title}
 

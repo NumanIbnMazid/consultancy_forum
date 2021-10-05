@@ -76,7 +76,10 @@
 <a href="{% url 'create_post' %}"><h4>+ create post</h4></a>
 {% if post_lists %}
 <center>
-    <h3 style="color:red"><u>Post</u></h3>
+    <h3 style="color:blue"><u>Post</u></h3>
+        {% for message in messages %}
+        <h4 style="color:red">...***... {{ message }} ...***...</h4>
+        {% endfor %}
 </center>
 <table style="text-align:center">
     <thead>
@@ -106,5 +109,7 @@
     {% endfor %}
     </tbody>
 </table>
+
+
 {% endif %}
 

@@ -232,48 +232,121 @@ def husband_update(request, slug):
 # #--------------------------------------- Post ---------------------------------------
 # #----------------------------------------****----------------------------------------
 @login_required()
-def create_post(request):
+def create_post_dummy(request):
     form = PostManageForm
-
     if request.method == 'POST':
-        if request.user.is_authenticated:
-            user_qs = request.user
-            title = request.POST.get('title')
-            thread = request.POST.get('thread')
-            description = request.POST.get('description')
+        user_qs = request.user
+        title = request.POST.get('title')
+        thread = request.POST.get('thread')
+        description = request.POST.get('description')
 
-            transaction_type = True
+        thread_qs = Thread.objects.filter(id=int(request.POST.get('thread')))
 
-            thread_weight_qs = Thread.objects.filter(id=thread).order_by('created_at').last()
-            post_weight = thread_weight_qs.weight
-            user_wallet_qs = UserWallet.objects.filter(user=user_qs).order_by('created_at')
-            if not user_wallet_qs:
-                messages.error(request, 'User Wallet Not Found')
-            if post_weight > 0:
-                user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user_qs).order_by('created_at').last()
-                if not user_wallet_transaction_qs:
-                    messages.error(request, 'Your Transaction Wallet Not Found, Please Purchase Point')
+        if thread_qs.exists():
+            thread_obj = thread_qs.first()
+            thread_weight = thread_obj.weight
+
+            if thread_weight > 0:
+                has_valid_flat_rate_transaction = False
+                has_available_points = False
+
+                # *** Is In Flat Rate Checking ***
+                flat_rate_plan_qs = UserWalletTransaction.objects.filter(user=request.user, transaction_type=1).order_by('created_at')
+                if flat_rate_plan_qs.exists():
+                    for user_wallet_transaction in flat_rate_plan_qs:
+                        if not user_wallet_transaction.flat_rate_plan.get_is_expired():
+                            has_valid_flat_rate_transaction = True
+                            break
+
+                if not has_valid_flat_rate_transaction:
+                    # update user wallet and set to None
+                    user_wallet_qs = UserWallet.objects.filter(user=request.user)
+                    if user_wallet_qs.exists():
+                        user_wallet_qs.update(is_in_flat_plan=False, flat_plan_created_at=None)
+
+                    # *** If Available Points Checking ***
+                    available_points = user_wallet_qs.first().available_points
+
+                    # check if available point is greater than or equal thread_weight
+                    if available_points >= thread_weight:
+                        # update user wallet and deduct points
+                        user_wallet_qs.update(available_points=(available_points - thread_weight))
+                        # create post
+                        Post.objects.create(user=user_qs, title=title, thread=thread_obj,
+                                            description=description)
+                        messages.success(request, 'Post created successfully!')
+                        return HttpResponseRedirect(reverse('user_profile'))
+                    else:
+                        has_available_points = False
+
+                # if has valid flat rate transaction
+                else:
+                    Post.objects.create(user=user_qs, title=title, thread=thread_obj,
+                                        description=description)
+                    messages.success(request, 'Successfully Post Added')
                     return HttpResponseRedirect(reverse('user_profile'))
-                # ------------------ user transaction type check ------------------------
-                transaction_type = check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs)
 
-            if not transaction_type:
-                messages.error(request, 'User Transaction Not valid')
-                return redirect('user_profile')
-            elif transaction_type:
-                Post.objects.create(user=user_qs, title=title, thread_id=thread,
-                                    description=description)
+                if not has_valid_flat_rate_transaction and not has_available_points:
+                    messages.error(request, f'Please purchase points or flat rate plan to create post under this thread. This thread requires at least {thread_weight} points.')
+                    return redirect('user_profile')
+
+            # if there is no weight of thread
             else:
-                if not post_weight <= user_wallet_qs.last().available_points:
-                    messages.error(request, request.user+' Have not Available Point')
-                Post.objects.create(user=user_qs, title=title, thread_id=thread,
+                Post.objects.create(user=user_qs, title=title, thread=thread_obj,
                                     description=description)
-                user_wallet_update(request,user_wallet_qs, post_weight)
-            messages.success(request,'Successfully Post Added')
-            return HttpResponseRedirect(reverse('user_profile'))
+                messages.success(request, 'Successfully Post Added')
+                return HttpResponseRedirect(reverse('user_profile'))
+        else:
+            messages.error(request, 'Thread not found!')
+            return redirect('user_profile')
 
-    context ={'form':form}
+        messages.error(request, 'Something went wrong!')
+    context = {'form': form}
     return render(request, 'user-panel/form.html', context)
+
+# @login_required()
+# def create_post(request):
+#     form = PostManageForm
+#
+#     if request.method == 'POST':
+#         if request.user.is_authenticated:
+#             user_qs = request.user
+#             title = request.POST.get('title')
+#             thread = request.POST.get('thread')
+#             description = request.POST.get('description')
+#
+#             transaction_type = True
+#
+#             thread_weight_qs = Thread.objects.filter(id=thread).order_by('created_at').last()
+#             post_weight = thread_weight_qs.weight
+#             user_wallet_qs = UserWallet.objects.filter(user=user_qs).order_by('created_at')
+#             if not user_wallet_qs:
+#                 messages.error(request, 'User Wallet Not Found')
+#             if post_weight > 0:
+#                 user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user_qs).order_by('created_at').last()
+#                 if not user_wallet_transaction_qs:
+#                     messages.error(request, 'Your Transaction Wallet Not Found, Please Purchase Point')
+#                     return HttpResponseRedirect(reverse('user_profile'))
+#                 # ------------------ user transaction type check ------------------------
+#                 transaction_type = check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs)
+#
+#             if not transaction_type:
+#                 messages.error(request, 'User Transaction Not valid')
+#                 return redirect('user_profile')
+#             elif transaction_type:
+#                 Post.objects.create(user=user_qs, title=title, thread_id=thread,
+#                                     description=description)
+#             else:
+#                 if not post_weight <= user_wallet_qs.last().available_points:
+#                     messages.error(request, request.user+' Have not Available Point')
+#                 Post.objects.create(user=user_qs, title=title, thread_id=thread,
+#                                     description=description)
+#                 user_wallet_update(request,user_wallet_qs, post_weight)
+#             messages.success(request,'Successfully Post Added')
+#             return HttpResponseRedirect(reverse('user_profile'))
+#
+#     context ={'form':form}
+#     return render(request, 'user-panel/form.html', context)
 
 # #-----------------------------***-----------------------------
 # #------------------------ Post Details ------------------------

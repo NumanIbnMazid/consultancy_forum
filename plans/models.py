@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from users.models import UserWallet
 from django.utils import timezone
+import datetime
 
 
 """ 
@@ -159,6 +160,20 @@ class FlatRatePlan(models.Model):
         elif self.expiration_cycle == 2:
             return "Lifetime"
         return "Monthly"
+
+    def get_is_expired(self):
+        is_expired = True
+        current_datetime = timezone.now()
+        timedelta_days = (current_datetime - self.created_at).days
+        if self.expiration_cycle == 0:
+            if timedelta_days <= 30:
+                is_expired = False
+        if self.expiration_cycle == 1:
+            if timedelta_days <= 365:
+                is_expired = False
+        if self.expiration_cycle == 2:
+            is_expired = False
+        return is_expired
 
 
 """ 

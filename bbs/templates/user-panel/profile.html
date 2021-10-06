@@ -8,7 +8,8 @@
 
 </center>
 <a href="{% url 'user_profile_update' request.user.slug %}"><h4>Update Profile</h4></a>
-<table>
+
+<table style="text-align:center">
     <tr>
         <th>Name</th>
         <td>{{ request.user.name }}</td>
@@ -39,6 +40,10 @@
 
         <th>Flat Plan</th>
         <th>{{ user_wallet_transaction.flat_rate_plan.get_expiration_cycle_str }}</th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
     </tr>
 </table>
 
@@ -74,13 +79,13 @@
 {% endif %}
 
 <a href="{% url 'create_post' %}"><h4>+ create post</h4></a>
-{% if post_lists %}
 <center>
     <h3 style="color:blue"><u>Post</u></h3>
         {% for message in messages %}
         <h4 style="color:red">...***... {{ message }} ...***...</h4>
         {% endfor %}
 </center>
+{% if post_lists %}
 <table style="text-align:center">
     <thead>
         <tr>

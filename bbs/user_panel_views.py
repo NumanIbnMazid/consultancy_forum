@@ -50,7 +50,7 @@ def check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet
             if not user_point_wallet_transaction_qs:
                 messages.error(request, 'Please Update Your Wallet')
                 return False
-            elif user_wallet_qs.last().available_points < 1:
+            elif user_wallet_qs.last().available_points <= 0:
                 messages.error(request, 'You have not Available Points, Please update Your Wallet')
                 return False
             return 'point_transaction_type'
@@ -90,6 +90,12 @@ def user_wallet_checking(request, post_qs, user_qs):
     :param user_qs: (request user)
     :return: (list)
     """
+    # user_wallet_qs = ''
+    # user_available_points = 0
+    # post_weight = 0
+    # user_wallet_transaction_qs = ''
+    # transaction_type =''
+    context ={}
     if not post_qs:
         return HttpResponseNotFound('<h3> Post not found </h3>')
     user_wallet_qs = UserWallet.objects.filter(user_id = user_qs).order_by('created_at')
@@ -104,7 +110,8 @@ def user_wallet_checking(request, post_qs, user_qs):
 
     user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user=user_wallet_qs.last().user).order_by('created_at').last()
     if not user_wallet_transaction_qs:
-        messages.error(request,'User Wallet Transaction not found')
+        messages.error(request,'Your Transaction Wallet Not Found, Please Purchase Point')
+        return context
 
     transaction_type = check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs)
     if not transaction_type:
@@ -234,21 +241,26 @@ def create_post(request):
             title = request.POST.get('title')
             thread = request.POST.get('thread')
             description = request.POST.get('description')
+
+            transaction_type = True
+
             thread_weight_qs = Thread.objects.filter(id=thread).order_by('created_at').last()
             post_weight = thread_weight_qs.weight
             user_wallet_qs = UserWallet.objects.filter(user=user_qs).order_by('created_at')
             if not user_wallet_qs:
                 messages.error(request, 'User Wallet Not Found')
-            user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user_qs).order_by('created_at').last()
-            if not user_wallet_transaction_qs:
-                messages.error(request, 'User Wallet Transaction Not Found')
-            # ------------------ user transaction type check ------------------------
-            transaction_type = check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs)
+            if post_weight > 0:
+                user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user_qs).order_by('created_at').last()
+                if not user_wallet_transaction_qs:
+                    messages.error(request, 'Your Transaction Wallet Not Found, Please Purchase Point')
+                    return HttpResponseRedirect(reverse('user_profile'))
+                # ------------------ user transaction type check ------------------------
+                transaction_type = check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs)
 
-            if transaction_type == False:
+            if not transaction_type:
                 messages.error(request, 'User Transaction Not valid')
                 return redirect('user_profile')
-            elif transaction_type == True:
+            elif transaction_type:
                 Post.objects.create(user=user_qs, title=title, thread_id=thread,
                                     description=description)
             else:
@@ -275,7 +287,7 @@ def post_details(request, slug):
 
     user_available_points = 0
     user_wallet_qs = ''
-    transaction_type = ''
+    transaction_type = False
 
     if post_qs.weight > 0:
         post_weight = post_qs.weight
@@ -287,18 +299,23 @@ def post_details(request, slug):
     if not post_weight == 0:
         # .............***.............User Wallet Checking .............***.............
         user_wallet = user_wallet_checking(request, post_qs, user_qs)
-        user_available_points = user_wallet.get('user_available_points')
-        user_wallet_qs = user_wallet.get('user_wallet_qs')
-        transaction_type = user_wallet.get('transaction_type')
-        if user_wallet.get('user_wallet_transaction_qs').transaction_type == 0:  # Only Check When Transaction Type is Point
-            if not post_weight <= user_available_points:
-                messages.error(request, 'User Does not Available Points')
-                return HttpResponseRedirect(reverse('user_profile'))
+        if user_wallet:
+            user_available_points = user_wallet.get('user_available_points')
+            user_wallet_qs = user_wallet.get('user_wallet_qs')
+            transaction_type = user_wallet.get('transaction_type')
+            user_wallet_transaction_qs = user_wallet.get('user_wallet_transaction_qs')
+            if user_wallet_transaction_qs.transaction_type == 0:  # Only Check When Transaction Type is Point
+                if not post_weight <= user_available_points:
+                    messages.error(request, 'User Does Not Have Available Points')
+                    return HttpResponseRedirect(reverse('user_profile'))
+        else:
+            user_wallet = None
 
 
     context = {'form': form,'post_qs':post_qs,'page_title':page_title,
                'available_point':user_available_points,
-               'post_weight':post_weight}
+               'post_weight':post_weight,
+               'user_wallet':user_wallet}
 
     if request.method == 'POST':
         if request.user.is_authenticated:
@@ -388,7 +405,7 @@ def comment_reply(request, id):
             if user_wallet.get(
                     'user_wallet_transaction_qs').transaction_type == 0:  # Only Check When Transaction Type is Point
                 if not post_weight <= user_available_points:
-                    messages.error(request, 'User Does not Available Points')
+                    messages.error(request, 'User Does Not Have Available Points')
                     return HttpResponseRedirect(reverse('user_profile'))
 
         context = {'form': form,'post_qs':post_qs,'page_title':page_title}

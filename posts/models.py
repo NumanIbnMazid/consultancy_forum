@@ -69,6 +69,9 @@ class Post(models.Model):
     description = models.TextField(
         blank=True, null=True
     )
+    allowed_users = models.ManyToManyField(
+        get_user_model(), related_name='allowed_users', null=True, blank=True
+    )
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name='created at'
     )

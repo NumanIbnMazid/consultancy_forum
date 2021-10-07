@@ -2,62 +2,6 @@
 {% load custom_tags %}
 {% include 'user-panel/base.html' %}
 
-<!--<div class="row">-->
-<!--	<div class="col-md-3">-->
-<!--		<div class="card card-body">-->
-<!--			<a class="btn btn-warning" href="{% url 'user_profile' %}"> &#8592; Back to Profile</a>-->
-<!--			<center>-->
-<!--			<hr>-->
-<!--			<h3 style="text-align: center">{{ page_title }}</h3>-->
-<!--			<hr>-->
-<!--			{% for message in messages %}-->
-<!--			<h4 style="color:red">...***... {{ message }} ...***...</h4>-->
-<!--			{% endfor %}-->
-<!--			</center>-->
-
-<!--		</div>-->
-<!--	</div>-->
-<!--	<div class="col-md-9">-->
-<!--		<div class="card card-body">-->
-<!--			<div>-->
-<!--				<h2 style="color:blue">{{ post_qs.user }} | {{ post_qs.thread }} | {{ post_qs.created_at|date }}</h2>-->
-<!--				{% if user_wallet  %}-->
-<!--				<p>{{ post_qs.description|safe }}</p>-->
-<!--				{% else %}-->
-<!--				<p>{{ post_qs.description|truncate_fifty_percent_word|safe }}</p>-->
-<!--				<button> Read More </button>-->
-<!--				{% endif %}-->
-<!--			</div>-->
-<!--			<h3>Comments ({{ post_qs.post_comments.count }})</h3>-->
-<!--			{% for comment in post_qs.post_comments.all %}-->
-
-<!--			<p>Comment : {{ comment.comment }}</p>-->
-<!--			{% for reply in comment.comment_replies.all %}-->
-<!--				<p>reply : {{ reply.reply }}</p>-->
-<!--				{% endfor %}-->
-<!--				{% if user_wallet  %}-->
-<!--					<form method="POST" action="{% url 'comment_reply' id=comment.id %}" enctype="multipart/form-data">-->
-<!--						{% csrf_token %}-->
-<!--						<textarea class="form-control" name="reply" rows="3" id="reply"></textarea>-->
-<!--						<button type="submit">Reply</button>-->
-
-<!--					</form>-->
-<!--			{% endif %}-->
-<!--			{% endfor %}-->
-<!--			<hr>-->
-<!--			{% if user_wallet  %}-->
-<!--			<p>Leave a Comment</p>-->
-<!--			<form method="POST" action="" enctype="multipart/form-data">-->
-<!--				{% csrf_token %}-->
-<!--				<textarea class="form-control" name="comment" rows="3" id=""></textarea>-->
-<!--				<button type="submit">Comment</button>-->
-
-<!--			</form>-->
-<!--			{% endif %}-->
-<!--		</div>-->
-<!--	</div>-->
-<!--</div>-->
-
 <div>
 	<center>
 	<hr>
@@ -67,8 +11,39 @@
 	<h4 style="color:red">...***... {{ message }} ...***...</h4>
 	{% endfor %}
 	</center>
-	<h2 style="color:blue">{{ post_qs.user }} | {{ post_qs.thread }} | {{ post_qs.created_at|date }}</h2>
-	<p>{{ post_qs.description|safe }}</p>
+	<h2 style="color:blue">{{ post_qs.user }} | {{ post_qs.thread }} | {{ post_qs.created_at|date }} </h2>
+	{% if not is_valid %}
+		<p>{{ post_qs.description|truncate_fifty_percent_word|safe }}</p>
+	<button>Continue Reading</button>
+	{% else %}
+		<p>{{ post_qs.description|safe }})</p>
+	{% endif %}
+					<!--	Comment & Reply Section -->
 
-
+	<h3>Comments ({{ post_qs.post_comments.count }})</h3>
+		{% for comment in post_qs.post_comments.all %}
+			<p>Comment : {{ comment.comment }}</p>
+			{% for reply in comment.comment_replies.all %}
+				<p>reply : {{ reply.reply }}</p>
+			{% endfor %}
+			<!--	Reply Form-->
+			{% if is_valid  %}
+				<form method="POST" action="{% url 'comment_reply' id=comment.id %}" enctype="multipart/form-data">
+					{% csrf_token %}
+					<textarea class="form-control" name="reply" rows="3" id="reply"></textarea>
+					<button type="submit">Reply</button>
+				</form>
+			{% endif %}
+		{% endfor %}
+	<hr>
+		{% if is_valid %}
+			<!--	Comment Form-->
+			<p>Leave a Comment</p>
+			<form method="POST" action="" enctype="multipart/form-data">
+				{% csrf_token %}
+				<textarea class="form-control" name="comment" rows="3" id=""></textarea>
+				<button type="submit">Comment</button>
+			</form>
+		{% endif %}
+		</div>
 </div>

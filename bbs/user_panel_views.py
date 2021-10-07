@@ -232,7 +232,7 @@ def husband_update(request, slug):
 # #--------------------------------------- Post ---------------------------------------
 # #----------------------------------------****----------------------------------------
 @login_required()
-def create_post_dummy(request):
+def create_post(request):
     form = PostManageForm
     if request.method == 'POST':
         user_qs = request.user

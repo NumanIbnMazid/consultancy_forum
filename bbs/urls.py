@@ -39,7 +39,7 @@ USER_PANEL_URLS = [
 
     # -----------------------------*** Post ***-----------------------------
     #   -----------------------------*** *** ***-----------------------------
-    path('create-post/', views.create_post_dummy, name='create_post'),
+    path('create-post/', views.create_post, name='create_post'),
     path('post-details/<slug>/', views.post_details, name='post_details'),
     path('post-update/<slug>/', views.post_update, name='post_update'),
     path('post_delete/<slug>/', views.post_delete, name='post_delete'),

@@ -313,22 +313,22 @@ def post_details(request, slug):
     post_qs = Post.objects.filter(slug=slug).order_by('created_at').last()
     page_title = post_qs.title
     form = PostManageForm(instance=post_qs)
-
     user_wallet = None
-
     # ...***... Post Weight Check Start ...***...
     if post_qs.weight > 0:
         post_weight = post_qs.weight
     else:
         post_weight = post_qs.thread.weight
     # ...***... Post Weight Check End...***...
+
     has_valid_flat_rate_transaction = False
     available_points = False
+    # ...***... For Details Post Show ...***...
     is_valid = False
     comment = request.POST.get('comment')
 
     if post_weight > 0:
-        # ...***... Is In Flat Rate Checking ...***...
+        # ...***... Is In Flat Rate Checking Start ...***...
         flat_rate_plan_qs = UserWalletTransaction.objects.filter(user=request.user, transaction_type=1).order_by(
             'created_at')
         if flat_rate_plan_qs.exists():
@@ -337,34 +337,44 @@ def post_details(request, slug):
                     has_valid_flat_rate_transaction = True
                     is_valid = True
                     break
+        # ...***... Is In Flat Rate Checking End ...***...
+        # ...***... Flat Rate Validation Checking Start ...***...
         if not has_valid_flat_rate_transaction:
             # ...***... Update User Wallet and Set to None Start ...***...
             user_wallet_qs = UserWallet.objects.filter(user=request.user)
             if user_wallet_qs.exists:
                 user_wallet_qs.update(is_in_flat_plan=False, flat_plan_created_at=None)
             # ...***... Update User Wallet and Set to None End ...***...
-
             # ...***... Available Points Check Start ...***...
             available_points = user_wallet_qs.first().available_points
             # ...***... Available Points Check End ...***...
+
+            # ...***... Available Point is less than or not Post Weight Checking Start ...***...
             if available_points >= post_weight:
                 is_valid = True
+                # ...***... Comment Create Start ...***...
                 if request.method == 'POST':
                     user_wallet_qs.update(available_points=(available_points - post_weight))
                     Comment.objects.create(post=post_qs,
                                            commented_by=request.user,
                                            comment=comment)
                     messages.success(request, 'Comment Add Successfully!')
+                # ...***... Comment Create End ...***...
             else:
                 available_points = True
                 messages.error(request, f'Please purchase points or flat rate plan to create post under this'
                                         f' thread. This thread requires at least {post_weight} points.')
+            # ...***... Available Point is less than or not Post Weight Checking End ...***...
+        # ...***... Is Has Flat Rate is valid ...***...
         else:
             if request.method == 'POST':
                 Comment.objects.create(post=post_qs,
                                        commented_by=request.user,
                                        comment=comment)
                 messages.success(request, 'Comment Add Successfully!')
+        # ...***... Flat Rate Validation Checking End ...***...
+
+    # ...***.. When Post Weight or Thread Weight is Zero Start...***...
     else:
         is_valid = True
         available_points = True
@@ -373,10 +383,13 @@ def post_details(request, slug):
                                    commented_by=request.user,
                                    comment=comment)
             messages.success(request, 'Comment Add Successfully!')
+    # ...***.. When Post Weight or Thread Weight is Zero End ...***...
+    # ...***.. When User Wallet is not Valid Start ...***...
     if not has_valid_flat_rate_transaction and not available_points:
         messages.error(request, f'Please purchase points or flat rate plan to create post '
                                 f'under this thread. This thread requires at least {post_weight} points.')
         return redirect('user_profile')
+    # ...***.. When User Wallet is not Valid End ...***...
 
     context = {'form': form, 'post_qs': post_qs,
                'page_title': page_title,

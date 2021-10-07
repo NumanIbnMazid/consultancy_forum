@@ -305,50 +305,6 @@ def create_post(request):
     context = {'form': form}
     return render(request, 'user-panel/form.html', context)
 
-# @login_required()
-# def create_post(request):
-#     form = PostManageForm
-#
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user_qs = request.user
-#             title = request.POST.get('title')
-#             thread = request.POST.get('thread')
-#             description = request.POST.get('description')
-#
-#             transaction_type = True
-#
-#             thread_weight_qs = Thread.objects.filter(id=thread).order_by('created_at').last()
-#             post_weight = thread_weight_qs.weight
-#             user_wallet_qs = UserWallet.objects.filter(user=user_qs).order_by('created_at')
-#             if not user_wallet_qs:
-#                 messages.error(request, 'User Wallet Not Found')
-#             if post_weight > 0:
-#                 user_wallet_transaction_qs = UserWalletTransaction.objects.filter(user = user_qs).order_by('created_at').last()
-#                 if not user_wallet_transaction_qs:
-#                     messages.error(request, 'Your Transaction Wallet Not Found, Please Purchase Point')
-#                     return HttpResponseRedirect(reverse('user_profile'))
-#                 # ------------------ user transaction type check ------------------------
-#                 transaction_type = check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs)
-#
-#             if not transaction_type:
-#                 messages.error(request, 'User Transaction Not valid')
-#                 return redirect('user_profile')
-#             elif transaction_type:
-#                 Post.objects.create(user=user_qs, title=title, thread_id=thread,
-#                                     description=description)
-#             else:
-#                 if not post_weight <= user_wallet_qs.last().available_points:
-#                     messages.error(request, request.user+' Have not Available Point')
-#                 Post.objects.create(user=user_qs, title=title, thread_id=thread,
-#                                     description=description)
-#                 user_wallet_update(request,user_wallet_qs, post_weight)
-#             messages.success(request,'Successfully Post Added')
-#             return HttpResponseRedirect(reverse('user_profile'))
-#
-#     context ={'form':form}
-#     return render(request, 'user-panel/form.html', context)
-
 # #-----------------------------***-----------------------------
 # #------------------------ Post Details ------------------------
 # #-----------------------------***-----------------------------

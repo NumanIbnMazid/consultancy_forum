@@ -444,9 +444,25 @@ def comment_reply(request, id):
         post_qs = Post.objects.filter(slug=slug).last()
         page_title = post_qs.title
         form = PostManageForm(instance=post_qs)
+        user_wallet = None
+        # ...***... Post Weight Check Start ...***...
+        if post_qs.weight > 0:
+            post_weight = post_qs.weight
+        else:
+            post_weight = post_qs.thread.weight
+        # ...***... Post Weight Check End...***...
+        has_valid_flat_rate_transaction = False
+        available_points = False
+        # ...***... For Details Post Show ...***...
+        is_valid = False
+        reply = request.POST.get("reply")
+
     else:
-        pass
-    context = {'form': form,'post_qs':post_qs,'page_title':page_title}
+        messages.error(request, 'Something went wrong!')
+    context = {'form': form,
+               'post_qs':post_qs,
+               'page_title':page_title,
+               'is_valid':is_valid}
     return render(request, 'user-panel/post-details.html', context)
 
 # @login_required()

@@ -457,7 +457,18 @@ def comment_reply(request, id):
         is_valid = False
         if request.method =='POST':
             reply = request.POST.get("reply")
-            pass
+            if post_weight > 0:
+                # ...***... Is In Flat Rate Checking Start ...***...
+                flat_rate_plan_qs = UserWalletTransaction.objects.filter(user=request.user,
+                                                                         transaction_type=1).order_by(
+                    'created_at')
+                if flat_rate_plan_qs.exists():
+                    pass
+                else:
+                    pass
+                # ...***... Is In Flat Rate Checking End ...***...
+            else:
+                pass
         else:
             pass
 

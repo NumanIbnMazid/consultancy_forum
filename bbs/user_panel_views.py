@@ -473,10 +473,27 @@ def comment_reply(request, id):
                 if not has_valid_flat_rate_transaction:
                     # ...***... Update User Wallet and Set to None Start ...***...
                     user_wallet_qs = UserWallet.objects.filter(user=request.user)
+                    if user_wallet_qs.exists:
+                        user_wallet_qs.update(is_in_flat_plan=False, flat_plan_created_at=None)
+                    # ...***... Update User Wallet and Set to None End ...***...
+                    # ...***... Available Points Check Start ...***...
+                    available_points = user_wallet_qs.first().available_points
+                    # ...***... Available Points Check End ...***...
+
+                    # ...***... Available Point is less than or not Post Weight Checking Start ...***...
+                    if available_points >= post_weight:
+                        is_valid = True
+                        # ...***... Comment Create Start ...***...
+                        if request.method == 'POST':
+                            user_wallet_qs.update(available_points=(available_points - post_weight))
+                            CommentReply.objects.create(comment=comment_object,
+                                                replied_by=request.user,
+                                                reply=reply)
+                            messages.success(request, 'Comment Add Successfully!')
+                        # ...***... Comment Create End ...***...
                 else:
                     pass
                 # ...***... Flat Rate Validation Checking Start ...***...
-
             else:
                 pass
         else:

@@ -439,10 +439,14 @@ def post_delete(request, slug):
 def comment_reply(request, id):
     comment_qs = Comment.objects.filter(id=id)
     if comment_qs:
-        pass
+        comment_object = comment_qs.last()
+        slug = comment_object.post.slug
+        post_qs = Post.objects.filter(slug=slug).last()
+        page_title = post_qs.title
+        form = PostManageForm(instance=post_qs)
     else:
         pass
-    context={}
+    context = {'form': form,'post_qs':post_qs,'page_title':page_title}
     return render(request, 'user-panel/post-details.html', context)
 
 # @login_required()

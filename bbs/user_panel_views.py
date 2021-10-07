@@ -337,7 +337,7 @@ def post_details(request, slug):
                     has_valid_flat_rate_transaction = True
                     is_valid = True
                     break
-        # ...***... Is In Flat Rate Checking End ...***...
+
         # ...***... Flat Rate Validation Checking Start ...***...
         if not has_valid_flat_rate_transaction:
             # ...***... Update User Wallet and Set to None Start ...***...
@@ -463,10 +463,20 @@ def comment_reply(request, id):
                                                                          transaction_type=1).order_by(
                     'created_at')
                 if flat_rate_plan_qs.exists():
-                    pass
+                    for user_wallet_transaction in flat_rate_plan_qs:
+                        if not user_wallet_transaction.flat_rate_plan.get_is_expired():
+                            has_valid_flat_rate_transaction = True
+                            is_valid = True
+                            break
+                # ...***... Is In Flat Rate Checking End ...***...
+                # ...***... Flat Rate Validation Checking Start ...***...
+                if not has_valid_flat_rate_transaction:
+                    # ...***... Update User Wallet and Set to None Start ...***...
+                    user_wallet_qs = UserWallet.objects.filter(user=request.user)
                 else:
                     pass
-                # ...***... Is In Flat Rate Checking End ...***...
+                # ...***... Flat Rate Validation Checking Start ...***...
+
             else:
                 pass
         else:

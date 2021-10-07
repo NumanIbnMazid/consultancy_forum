@@ -455,7 +455,11 @@ def comment_reply(request, id):
         available_points = False
         # ...***... For Details Post Show ...***...
         is_valid = False
-        reply = request.POST.get("reply")
+        if request.method =='POST':
+            reply = request.POST.get("reply")
+            pass
+        else:
+            pass
 
     else:
         messages.error(request, 'Something went wrong!')

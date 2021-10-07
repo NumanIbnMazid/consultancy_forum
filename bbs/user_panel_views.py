@@ -365,86 +365,72 @@ def post_details(request, slug):
     else:
         post_weight = post_qs.thread.weight
     # ...***... Post Weight Check End...***...
-    if post_weight > 0:
-        has_valid_flat_rate_transaction = False
-        has_available_points = False
-        user_wallet = user_wallet_checking(request, post_qs, user_qs= request.user)
-        if user_wallet:
-            pass
-        else:
-            user_wallet = None
+    has_valid_flat_rate_transaction = False
+    available_points = False
 
-    context = {'form': form,'post_qs':post_qs,
-               'page_title':page_title,
-               # 'available_point':user_available_points,
-               'post_weight':post_weight
-               # 'user_wallet':user_wallet
-             }
-            # return HttpResponseRedirect(reverse("account_login"))
-    return render(request, 'user-panel/post-details.html', context)
-# @login_required()
-# def post_details(request, slug):
-#     post_qs = Post.objects.filter(slug=slug).order_by('created_at').last()
-#     page_title = post_qs.title
-#     form = PostManageForm(instance=post_qs)
-#
-#     user_available_points = 0
-#     user_wallet_qs = ''
-#     transaction_type = False
-#
-#     if post_qs.weight > 0:
-#         post_weight = post_qs.weight
-#     else:
-#         post_weight = post_qs.thread.weight
-#
-#     user_qs = request.user
-#
-#     if not post_weight == 0:
-#         # .............***.............User Wallet Checking .............***.............
-#         user_wallet = user_wallet_checking(request, post_qs, user_qs)
-#         if user_wallet:
-#             user_available_points = user_wallet.get('user_available_points')
-#             user_wallet_qs = user_wallet.get('user_wallet_qs')
-#             transaction_type = user_wallet.get('transaction_type')
-#             user_wallet_transaction_qs = user_wallet.get('user_wallet_transaction_qs')
-#             if user_wallet_transaction_qs.transaction_type == 0:  # Only Check When Transaction Type is Point
-#                 if not post_weight <= user_available_points:
-#                     messages.error(request, 'User Does Not Have Available Points')
-#                     return HttpResponseRedirect(reverse('user_profile'))
-#         else:
-#             user_wallet = None
-#
-#
-#     context = {'form': form,'post_qs':post_qs,'page_title':page_title,
-#                'available_point':user_available_points,
-#                'post_weight':post_weight,
-#                'user_wallet':user_wallet}
-#
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             comment = request.POST.get("comment")
-#             if comment:
-#                 if transaction_type==False:
-#                     messages.error(request, 'User Transaction Not valid')
-#                     return redirect(reverse("post_details", kwargs={"slug": slug}))
-#                 elif transaction_type == True:
-#                     Comment.objects.create(
-#                         post=post_qs,
-#                         commented_by=request.user,
-#                         comment=comment)
-#                 else:
-#                     Comment.objects.create(
-#                         post=post_qs,
-#                         commented_by=request.user,
-#                         comment=comment
-#                     )
-#                     # -------------- User Wallet Update --------------
-#                     user_wallet_update(request,user_wallet_qs, post_weight)
-#                 messages.success(request, 'Successfully Comment Added')
-#             return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
-#         else:
-#             return HttpResponseRedirect(reverse("account_login"))
-#     return render(request, 'user-panel/post-details.html', context)
+    context = {'form': form, 'post_qs': post_qs,
+               'page_title': page_title,
+               'available_point': available_points,
+               'post_weight': post_weight,
+               'user_wallet': user_wallet
+               }
+    if request.method == 'POST':
+        comment = request.POST.get("comment")
+        if post_weight > 0:
+            # ...***... Is In Flat Rate Checking ...***...
+            flat_rate_plan_qs = UserWalletTransaction.objects.filter(user=request.user, transaction_type=1).order_by('created_at')
+            if flat_rate_plan_qs.exists():
+                for user_wallet_transaction in flat_rate_plan_qs:
+                    if not user_wallet_transaction.flat_rate_plan.get_is_expired():
+                        has_valid_flat_rate_transaction = True
+                        break
+            if not has_valid_flat_rate_transaction:
+                # ...***... Update User Wallet and Set to None Start ...***...
+                user_wallet_qs = UserWallet.objects.filter(user= request.user)
+                if user_wallet_qs.exists:
+                    user_wallet_qs.update(is_in_flat_plan=False, flat_plan_created_at=None)
+                # ...***... Update User Wallet and Set to None End ...***...
+
+                # ...***... Available Points Check Start ...***...
+                available_points = user_wallet_qs.first().available_points
+                # ...***... Available Points Check End ...***...
+
+                # ...***... Check if Available Point is Greater Than or Equal Thread Weight ...***...
+                if available_points >= post_weight:
+                    # ...***... Update Wallet Points Start ...***...
+                    user_wallet_qs.update(available_points =(available_points - post_weight))
+                    # ...***... Update Wallet Points End ...***...
+                    # ...***... Post Comment Create Start ...***...
+                    Comment.objects.create(post=post_qs,
+                                            commented_by=request.user,
+                                            comment=comment)
+                    # ...***... Post Comment Create End ...***...
+                    messages.success(request, 'Comment Create Successfully')
+                    return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+                else:
+                    available_points = False
+
+            # ...***... Post Comment Create When Flat Rate Transaction is Valid Start ...***...
+            else:
+                Comment.objects.create(post=post_qs,
+                                       commented_by=request.user,
+                                       comment=comment)
+                messages.success(request, 'Comment Create Successfully')
+                return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+            # ...***... Post Comment Create When Flat Rate Transaction is Valid End ...***...
+
+            if not has_valid_flat_rate_transaction and not available_points:
+                messages.error(request,
+                               f'Please purchase points or flat rate plan to create post under this thread. This thread requires at least {thread_weight} points.')
+                return redirect('user_profile')
+        else:
+            Comment.objects.create(post=post_qs,
+                                   commented_by=request.user,
+                                   comment=comment)
+            messages.success(request, 'Comment Create Successfully')
+            return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+    else:
+        return render(request, 'user-panel/post-details.html', context)
 
 # #-----------------------------***-----------------------------
 # #------------------------ Post Update ------------------------

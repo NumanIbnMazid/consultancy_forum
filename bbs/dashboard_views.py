@@ -485,101 +485,87 @@ def get_post_common_contexts(request):
     )
     return common_contexts
 
-
-@method_decorator(dashboard_decorators, name='dispatch')
 class PostListView(ListView):
-    # template_name = "dashboard/pages/job-application/list.html"
-    template_name = "dashboard/snippets/post.html"
+    template_name = "post/manage.html"
+    form_class = PostManageForm
+
+    def form_valid(self, form, **kwargs):
+        # title = form.instance.title
+        messages.add_message(
+            self.request, messages.SUCCESS, "User post created successfully!"
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("post_list")
 
     def get_queryset(self):
-        qs = Post.objects.filter(
-
-        )
-        if qs.exists():
-            return qs
-        return None
+        Post.objects.all()
 
     def get_context_data(self, **kwargs):
-        context = super(PostListView, self).get_context_data(**kwargs)
+        context = super(
+            PostListView, self
+        ).get_context_data(**kwargs)
         context['page_title'] = 'Post List'
-        context['page_short_title'] = 'Post List'
+        context['page_short_title'] = None
         for key, value in get_post_common_contexts(request=self.request).items():
             context[key] = value
-        context['list_objects'] = self.get_queryset()
-        # context['list_template'] = "dashboard/pages/job-application/datatable.html"
-        context['list_template'] = "dashboard/snippets/manage.html"
-        context['detail_url'] = "post_detail"
-        context['update_url'] = "post_update"
-        context['delete_url'] = "delete_post"
-        context['create_url'] = None
-        context['list_url'] = "post_list"
+        context["create_url"] = None
+        context["update_url"] = "post_update"
         return context
 
 
 @method_decorator(dashboard_decorators, name='dispatch')
-class PostUpdateView(UpdateView):
-    template_name = 'dashboard/snippets/manage.html'
-    form_class = PostManageForm
+class UserWalletTransactionDetailView(DetailView):
+    template_name = "user-wallet-transaction/detail-common.html"
 
     def get_object(self):
-        return get_simple_object(key="slug", model=Post, self=self)
+        return get_simple_object(key='slug', model=UserWalletTransaction, self=self)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            UserWalletTransactionDetailView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'User Wallet Transaction - {self.get_object().get_transaction_type_str()} Detail'
+        context['page_short_title'] = f'User Wallet Transaction - {self.get_object().get_transaction_type_str()} Detail'
+        for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
+            context[key] = value
+        # context["update_url"] = None
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class UserWalletTransactionUpdateView(UpdateView):
+    template_name = 'user-wallet-transaction/manage.html'
+    form_class = UserWalletTransactionManageForm
+
+    def get_object(self):
+        return get_simple_object(key="slug", model=UserWalletTransaction, self=self)
 
     def get_success_url(self):
-        return reverse('post_list')
+        return reverse("create_flat_rate_plan")
 
     def form_valid(self, form):
+        self.object = self.get_object()
         messages.add_message(
-            self.request, messages.SUCCESS, "Updated Successfully!"
+            self.request, messages.SUCCESS, "User wallet transaction updated successfully!"
         )
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super(
-            PostUpdateView, self
+            UserWalletTransactionUpdateView, self
         ).get_context_data(**kwargs)
-        context['page_title'] = 'Update Post'
-        context['page_short_title'] = 'Update Post'
-        for key, value in get_post_common_contexts(request=self.request).items():
+        context['page_title'] = f'Update User Wallet Transaction "{self.get_object().get_transaction_type_str()}"'
+        context['page_short_title'] = f'Update User Wallet Transaction "{self.get_object().get_transaction_type_str()}"'
+        for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
             context[key] = value
-        context['update_url'] = "post_update"
-        context['detail_url'] = "post_detail"
-        context['delete_url'] = "delete_post"
-        context['create_url'] = None
-        context['list_url'] = "post_list"
-        context['list_template'] = "dashboard/snippets/post_datatable.html"
-        # context['list_template'] = "dashboard/pages/job-application/datatable.html"
-        context['list_objects'] = Post.objects.all()
-        return context
-
-
-@method_decorator(dashboard_decorators, name='dispatch')
-class PostDetailView(DetailView):
-    template_name = "dashboard/snippets/detail-common.html"
-
-    def get_object(self):
-        return get_simple_object(key='slug', model=Post, self=self)
-
-    def get_context_data(self, **kwargs):
-        context = super(
-            PostDetailView, self
-        ).get_context_data(**kwargs)
-        context['page_title'] = 'Post Detail'
-        context['page_short_title'] = 'Post Detail'
-        for key, value in get_post_common_contexts(request=self.request).items():
-            context[key] = value
-        context['delete_url'] = "delete_post"
-        context['create_url'] = None
-        context['update_url'] = "post_update"
-        context['detail_url'] = "post_detail"
-        # context['list_template'] = "dashboard/pages/job-application/datatable.html"
-        context['list_template'] = "dashboard/snippets/manage.html"
-        context['list_objects'] = Post.objects.all()
-        context['list_url'] = "post_list"
+        context["update_url"] = None
         return context
 
 
 @csrf_exempt
 @has_dashboard_permission_required
 @login_required
-def delete_post(request):
-    return delete_simple_object(request=request, key='slug', model=Post, redirect_url="post_list")
+def delete_user_wallet_transaction(request):
+    return delete_simple_object(request=request, key='slug', model=UserWalletTransaction, redirect_url="create_user_wallet_transaction")

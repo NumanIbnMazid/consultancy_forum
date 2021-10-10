@@ -455,8 +455,8 @@ def comment_reply(request, id):
         available_points = False
         # ...***... For Details Post Show ...***...
         is_valid = False
+        reply = request.POST.get("reply")
         if request.method =='POST':
-            reply = request.POST.get("reply")
             if post_weight > 0:
                 # ...***... Is In Flat Rate Checking Start ...***...
                 flat_rate_plan_qs = UserWalletTransaction.objects.filter(user=request.user,
@@ -492,13 +492,36 @@ def comment_reply(request, id):
                             messages.success(request, 'Reply Add Successfully!')
                         # ...***... Comment Create End ...***...
                 else:
-                    pass
+                    available_points = True
+                    messages.error(request, f'Please purchase points or flat rate plan to create post under this'
+                                            f' thread. This thread requires at least {post_weight} points.')
+                    # ...***... Available Point is less than or not Post Weight Checking End ...***...
+                # ...***... Is Has Flat Rate is valid ...***...
                 # ...***... Flat Rate Validation Checking Start ...***...
             else:
-                pass
-        else:
-            pass
+                if request.method == 'POST':
+                    CommentReply.objects.create(comment=comment_object,
+                                                replied_by=request.user,
+                                                reply=reply)
+                    messages.success('Reply Add Successfully!')
+            # ...***... Flat Rate Validation Checking End ...***...
 
+        # ...***.. When Post Weight or Thread Weight is Zero Start...***...
+
+        else:
+            is_valid = True
+            available_points = True
+            if request.method == 'POST':
+                CommentReply.objects.create(comment=comment_object,
+                                            replied_by=request.user,
+                                            reply=reply)
+                messages.success(request, 'Reply Add Successfully!')
+            # ...***.. When Post Weight or Thread Weight is Zero End ...***...
+            # ...***.. When User Wallet is not Valid Start ...***...
+    if not has_valid_flat_rate_transaction and not available_points:
+        messages.error(request, f'Please purchase points or flat rate plan to create post '
+                                f'under this thread. This thread requires at least {post_weight} points.')
+        return redirect('user_profile')
     else:
         messages.error(request, 'Something went wrong!')
     context = {'form': form,

@@ -6,6 +6,7 @@ from django.conf.urls import url
 import debug_toolbar
 # from django.views.static import serve
 from . import views
+
 """ User Panel Views """
 from .views import (
     HomeView, create_husband
@@ -21,7 +22,7 @@ from .views import (
     FlatRatePlanCreateView, FlatRatePlanUpdateView, FlatRatePlanDetailView, delete_flat_rate_plan,
     # User Wallet Transaction
     UserWalletTransactionCreateView, UserWalletTransactionUpdateView, UserWalletTransactionDetailView,
-    delete_user_wallet_transaction
+    delete_user_wallet_transaction, PostListView, PostDetailView, PostUpdateView, delete_post
 )
 
 USER_PANEL_URLS = [
@@ -73,6 +74,15 @@ DASHBOARD_PANEL_URLS = [
     # path("update-user-wallet-transaction/<slug>/", UserWalletTransactionUpdateView.as_view(), name="update_user_wallet_transaction"),
     path("user-wallet-transaction/<slug>/detail/", UserWalletTransactionDetailView.as_view(), name="user_wallet_transaction_detail"),
     path("delete/user-wallet-transaction/", delete_user_wallet_transaction, name="delete_user_wallet_transaction"),
+    # ==============================*** Post URLS ***==============================
+    path("post/list/", PostListView.as_view(),
+         name="post_list"),
+    path("post/<slug>/update/", PostUpdateView.as_view(),
+         name="post_update"),
+    path("post/<slug>/detail/",
+         PostDetailView.as_view(), name="post_detail"),
+    path("delete/cv/", delete_post,
+         name="delete_post"),
 ]
 urlpatterns = [
     # For handling Static Files in Debug False Mode

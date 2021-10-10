@@ -1,5 +1,5 @@
 from django import forms
-from posts.models import Thread
+from posts.models import Thread, Post
 from ckeditor.widgets import CKEditorWidget
 
 """ 
@@ -27,3 +27,21 @@ class ThreadManageForm(forms.ModelForm):
         widgets = {
             'description': CKEditorWidget(),
         }
+
+# #........................... **** ...........................
+# #........................... Post ...........................
+# #........................... **** ...........................
+class PostManageForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(PostManageForm, self).__init__(*args, **kwargs)
+
+        self.fields['weight'].widget.attrs.update({
+            'placeholder': 'Enter Post Weight...',
+        })
+
+    class Meta:
+        model = Post
+        fields = [
+            'weight'
+        ]

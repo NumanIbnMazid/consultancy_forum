@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, CreateView, UpdateView, DetailView
+from django.views.generic import TemplateView, CreateView, UpdateView, DetailView, ListView
 from bbs.decorators import has_dashboard_permission_required
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -10,13 +10,13 @@ from bbs.helpers import (
 )
 # *** Forms Import ***
 # Posts
-from posts.forms import (ThreadManageForm)
+from posts.forms import (ThreadManageForm, PostManageForm)
 # Plans
 from plans.forms import (
     PointPlanManageForm, FlatRatePlanManageForm, UserWalletTransactionManageForm)
 # *** Models Import ***
 # Posts
-from posts.models import (Thread)
+from posts.models import (Thread, Post)
 # Plans
 from plans.models import (PointPlan, FlatRatePlan, UserWalletTransaction)
 
@@ -471,3 +471,117 @@ class UserWalletTransactionUpdateView(UpdateView):
 @login_required
 def delete_user_wallet_transaction(request):
     return delete_simple_object(request=request, key='slug', model=UserWalletTransaction, redirect_url="create_user_wallet_transaction")
+
+# #........................... **** ...........................
+# #........................... Post ...........................
+# #........................... **** ...........................
+
+### CV ###
+
+def get_post_common_contexts(request):
+    common_contexts = get_simple_context_data(
+        request=request, app_namespace=None, model_namespace="post", model=Post,
+        list_template=None, fields_to_hide_in_table=["id", "slug",'created_at','updated_at']
+    )
+    return common_contexts
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class PostListView(ListView):
+    # template_name = "dashboard/pages/job-application/list.html"
+    template_name = "dashboard/snippets/post.html"
+
+    def get_queryset(self):
+        qs = Post.objects.filter(
+            thread__id=None
+        )
+        if qs.exists():
+            return qs
+        return None
+
+    def get_context_data(self, **kwargs):
+        context = super(PostListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'CV List'
+        context['page_short_title'] = 'CV List'
+        for key, value in get_post_common_contexts(request=self.request).items():
+            context[key] = value
+        context['list_objects'] = self.get_queryset()
+        # context['list_template'] = "dashboard/pages/job-application/datatable.html"
+        context['list_template'] = "dashboard/snippets/manage.html"
+        context['detail_url'] = "post_detail"
+        context['update_url'] = "post_update"
+        context['delete_url'] = "delete_post"
+        context['create_url'] = None
+        context['list_url'] = "post_list"
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class PostUpdateView(UpdateView):
+    template_name = 'dashboard/snippets/manage.html'
+    form_class = PostManageForm
+
+    def get_object(self):
+        return get_simple_object(key="slug", model=Post, self=self)
+
+    def get_success_url(self):
+        return reverse('post_list')
+
+    def form_valid(self, form):
+        messages.add_message(
+            self.request, messages.SUCCESS, "Updated Successfully!"
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            PostUpdateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = 'Update Post'
+        context['page_short_title'] = 'Update Post'
+        for key, value in get_post_common_contexts(request=self.request).items():
+            context[key] = value
+        context['update_url'] = "post_update"
+        context['detail_url'] = "post_detail"
+        context['delete_url'] = "delete_post"
+        context['create_url'] = None
+        context['list_url'] = "post_list"
+        context['list_template'] = "dashboard/pages/job-application/datatable.html"
+        context['list_objects'] = Post.objects.filter(
+            thread_id = None
+        )
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class PostDetailView(DetailView):
+    template_name = "dashboard/snippets/detail-common.html"
+
+    def get_object(self):
+        return get_simple_object(key='slug', model=Post, self=self)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            PostDetailView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = 'CV Detail'
+        context['page_short_title'] = 'CV Detail'
+        for key, value in get_post_common_contexts(request=self.request).items():
+            context[key] = value
+        context['delete_url'] = "delete_post"
+        context['create_url'] = None
+        context['update_url'] = "post_update"
+        context['detail_url'] = "post_detail"
+        context['list_template'] = "dashboard/pages/job-application/datatable.html"
+        context['list_objects'] = Post.objects.filter(
+            thread__id=None
+        )
+        context['list_url'] = "post_list"
+        return context
+
+
+@csrf_exempt
+@has_dashboard_permission_required
+@login_required
+def delete_post(request):
+    return delete_simple_object(request=request, key='slug', model=Post, redirect_url="post_list")

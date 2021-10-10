@@ -22,7 +22,7 @@ from .views import (
     FlatRatePlanCreateView, FlatRatePlanUpdateView, FlatRatePlanDetailView, delete_flat_rate_plan,
     # User Wallet Transaction
     UserWalletTransactionCreateView, UserWalletTransactionUpdateView, UserWalletTransactionDetailView,
-    delete_user_wallet_transaction, PostListView, PostDetailView, PostUpdateView, delete_post
+    delete_user_wallet_transaction, PostListView, PostDetailView,delete_post,
 )
 
 USER_PANEL_URLS = [
@@ -77,8 +77,8 @@ DASHBOARD_PANEL_URLS = [
     # ==============================*** Post URLS ***==============================
     path("post/list/", PostListView.as_view(),
          name="post_list"),
-    path("post/<slug>/update/", PostUpdateView.as_view(),
-         name="post_update"),
+    # path("post/<slug>/update/", PostUpdateView.as_view(),
+    #      name="post_update"),
     path("post/<slug>/detail/",
          PostDetailView.as_view(), name="post_detail"),
     path("delete/cv/", delete_post,

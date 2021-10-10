@@ -492,7 +492,7 @@ class PostListView(ListView):
     def form_valid(self, form, **kwargs):
         # title = form.instance.title
         messages.add_message(
-            self.request, messages.SUCCESS, "User post created successfully!"
+            self.request, messages.SUCCESS, "User post List successfully!"
         )
         return super().form_valid(form)
 
@@ -516,21 +516,20 @@ class PostListView(ListView):
 
 
 @method_decorator(dashboard_decorators, name='dispatch')
-class UserWalletTransactionDetailView(DetailView):
-    template_name = "user-wallet-transaction/detail-common.html"
+class PostDetailView(DetailView):
+    template_name = "post/detail-common.html"
 
     def get_object(self):
-        return get_simple_object(key='slug', model=UserWalletTransaction, self=self)
+        return get_simple_object(key='slug', model=Post, self=self)
 
     def get_context_data(self, **kwargs):
         context = super(
-            UserWalletTransactionDetailView, self
+            PostDetailView, self
         ).get_context_data(**kwargs)
-        context['page_title'] = f'User Wallet Transaction - {self.get_object().get_transaction_type_str()} Detail'
-        context['page_short_title'] = f'User Wallet Transaction - {self.get_object().get_transaction_type_str()} Detail'
+        context['page_title'] = f'Post - {self.get_object().get_transaction_type_str()} Detail'
+        context['page_short_title'] = f'Post - {self.get_object().get_transaction_type_str()} Detail'
         for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
             context[key] = value
-        # context["update_url"] = None
         return context
 
 
@@ -567,5 +566,5 @@ class UserWalletTransactionUpdateView(UpdateView):
 @csrf_exempt
 @has_dashboard_permission_required
 @login_required
-def delete_user_wallet_transaction(request):
-    return delete_simple_object(request=request, key='slug', model=UserWalletTransaction, redirect_url="create_user_wallet_transaction")
+def delete_post(request):
+    return delete_simple_object(request=request, key='slug', model=Post, redirect_url="post_list")

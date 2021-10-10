@@ -526,10 +526,13 @@ class PostDetailView(DetailView):
         context = super(
             PostDetailView, self
         ).get_context_data(**kwargs)
-        context['page_title'] = f'Post - {self.get_object().get_transaction_type_str()} Detail'
-        context['page_short_title'] = f'Post - {self.get_object().get_transaction_type_str()} Detail'
+        context['page_title'] = f'Post - {self.get_object()} Detail'
+        context['page_short_title'] = f'Post - {self.get_object()} Detail'
         for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
             context[key] = value
+
+        context["create_url"] = None
+        context["update_url"] = "post_update"
         return context
 
 

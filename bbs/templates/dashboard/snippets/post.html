@@ -80,7 +80,7 @@
 
                                     <div class="collapse" id="collapsableActions_{{object.id}}">
                                         <!-- update job applicaiton status -->
-                                        <a href="{% url 'update_job_application_status' slug=object.slug %}"
+                                        <a href=""
                                             class="btn btn-primary btn-sm text-deco-none">
                                             <i class="fas fa-pen-alt" aria-hidden="true"></i>
                                         </a>
@@ -176,7 +176,7 @@
 
                                 {% elif field_type in 'TextField' %}
                                 <td>
-                                    {{ value|truncate_word:30|remove_html_tags }}
+                                    {{ value|truncate_word:10|remove_html_tags }}
                                 </td>
 
                                 {% else %}

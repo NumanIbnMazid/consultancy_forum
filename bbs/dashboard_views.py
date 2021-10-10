@@ -476,12 +476,12 @@ def delete_user_wallet_transaction(request):
 # #........................... Post ...........................
 # #........................... **** ...........................
 
-### CV ###
+### Post ###
 
 def get_post_common_contexts(request):
     common_contexts = get_simple_context_data(
         request=request, app_namespace=None, model_namespace="post", model=Post,
-        list_template=None, fields_to_hide_in_table=["id", "slug",'created_at','updated_at']
+        list_template=None, fields_to_hide_in_table=["id", "slug",'created_at','updated_at','allowed_users']
     )
     return common_contexts
 
@@ -493,7 +493,7 @@ class PostListView(ListView):
 
     def get_queryset(self):
         qs = Post.objects.filter(
-            thread__id=None
+
         )
         if qs.exists():
             return qs
@@ -501,8 +501,8 @@ class PostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PostListView, self).get_context_data(**kwargs)
-        context['page_title'] = 'CV List'
-        context['page_short_title'] = 'CV List'
+        context['page_title'] = 'Post List'
+        context['page_short_title'] = 'Post List'
         for key, value in get_post_common_contexts(request=self.request).items():
             context[key] = value
         context['list_objects'] = self.get_queryset()
@@ -546,10 +546,9 @@ class PostUpdateView(UpdateView):
         context['delete_url'] = "delete_post"
         context['create_url'] = None
         context['list_url'] = "post_list"
-        context['list_template'] = "dashboard/pages/job-application/datatable.html"
-        context['list_objects'] = Post.objects.filter(
-            thread_id = None
-        )
+        context['list_template'] = "dashboard/snippets/post_datatable.html"
+        # context['list_template'] = "dashboard/pages/job-application/datatable.html"
+        context['list_objects'] = Post.objects.all()
         return context
 
 
@@ -564,18 +563,17 @@ class PostDetailView(DetailView):
         context = super(
             PostDetailView, self
         ).get_context_data(**kwargs)
-        context['page_title'] = 'CV Detail'
-        context['page_short_title'] = 'CV Detail'
+        context['page_title'] = 'Post Detail'
+        context['page_short_title'] = 'Post Detail'
         for key, value in get_post_common_contexts(request=self.request).items():
             context[key] = value
         context['delete_url'] = "delete_post"
         context['create_url'] = None
         context['update_url'] = "post_update"
         context['detail_url'] = "post_detail"
-        context['list_template'] = "dashboard/pages/job-application/datatable.html"
-        context['list_objects'] = Post.objects.filter(
-            thread__id=None
-        )
+        # context['list_template'] = "dashboard/pages/job-application/datatable.html"
+        context['list_template'] = "dashboard/snippets/manage.html"
+        context['list_objects'] = Post.objects.all()
         context['list_url'] = "post_list"
         return context
 

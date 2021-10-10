@@ -88,8 +88,15 @@ class Post(models.Model):
         return self.title
 
     def get_fields(self):
-        return [get_dynamic_fields(field, self) for field in self.__class__._meta.fields]
+        def get_dynamic_fields(field):
+            if field.name == 'post':
+                return (field.name, self.post.title)
+            elif field.name == 'commented_by':
+                return (field.name, self.commented_by.username, field.get_internal_type())
+            else:
+                return (field.name, field.value_from_object(self), field.get_internal_type())
 
+        return [get_dynamic_fields(field) for field in self.__class__._meta.fields]
 
 # # -------------------------------------------------------------------
 # #                           Post Comment

@@ -63,8 +63,6 @@
                         {% else %}
                         {{ field|add_class:'form-control' }}
                         {% endif %}
-
-
                         <!-- select all button -->
                         {% if field.name == "permissions" or field.name == "user_group" %}
                         <div id="{{field.name}}_select-all" class="text-center m-2">

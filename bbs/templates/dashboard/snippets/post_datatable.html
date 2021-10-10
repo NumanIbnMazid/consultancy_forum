@@ -44,10 +44,7 @@
                             {% if not update_url == None or not detail_url == None or not delete_url == None %}
                             <td style="width:14%">
                                 <!-- update job applicaiton status -->
-                                <a href=""
-                                    class="btn btn-primary btn-sm text-deco-none">
-                                    <i class="fas fa-pen-alt" aria-hidden="true"></i>
-                                </a>
+
                                 <!-- update url -->
                                 {% if not update_url == None and can_change == True %}
                                 {% if not object.slug == None %}
@@ -66,7 +63,6 @@
                                 </a>
                                 {% endif %}
                                 {% endif %}
-
                                 {% if not detail_url == None and can_view == True %}
                                 {% if not object.slug == None %}
                                 <a href="{% url detail_url slug=object.slug %}"

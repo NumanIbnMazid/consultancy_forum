@@ -489,7 +489,7 @@ def comment_reply(request, id):
                             CommentReply.objects.create(comment=comment_object,
                                                 replied_by=request.user,
                                                 reply=reply)
-                            messages.success(request, 'Comment Add Successfully!')
+                            messages.success(request, 'Reply Add Successfully!')
                         # ...***... Comment Create End ...***...
                 else:
                     pass

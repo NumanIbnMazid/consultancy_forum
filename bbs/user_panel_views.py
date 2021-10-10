@@ -439,25 +439,25 @@ def post_delete(request, slug):
 def comment_reply(request, id):
     comment_qs = Comment.objects.filter(id=id)
     if comment_qs:
-        comment_object = comment_qs.last()
-        slug = comment_object.post.slug
-        post_qs = Post.objects.filter(slug=slug).last()
-        page_title = post_qs.title
-        form = PostManageForm(instance=post_qs)
-        user_wallet = None
-        # ...***... Post Weight Check Start ...***...
-        if post_qs.weight > 0:
-            post_weight = post_qs.weight
-        else:
-            post_weight = post_qs.thread.weight
-        # ...***... Post Weight Check End...***...
-        has_valid_flat_rate_transaction = False
-        available_points = False
-        # ...***... For Details Post Show ...***...
-        is_valid = False
-        reply = request.POST.get("reply")
-        if request.method =='POST':
-            if post_weight > 0:
+        if request.method == 'POST':
+            comment_object = comment_qs.last()
+            reply = request.POST.get("reply")
+            slug = comment_object.post.slug
+            post_qs = Post.objects.filter(slug=slug).last()
+            page_title = post_qs.title
+            form = PostManageForm(instance=post_qs)
+            user_wallet = None
+            is_valid = False
+            # ...***... Post Weight Check Start ...***...
+            if post_qs.weight > 0:
+                post_weight = post_qs.weight
+            else:
+                post_weight = post_qs.thread.weight
+            # ...***... Post Weight Check End...***...
+            has_valid_flat_rate_transaction = False
+            available_points = False
+            # ...***... For Details Post Show ...***...
+            if post_weight >0:
                 # ...***... Is In Flat Rate Checking Start ...***...
                 flat_rate_plan_qs = UserWalletTransaction.objects.filter(user=request.user,
                                                                          transaction_type=1).order_by(
@@ -471,59 +471,41 @@ def comment_reply(request, id):
                 # ...***... Is In Flat Rate Checking End ...***...
                 # ...***... Flat Rate Validation Checking Start ...***...
                 if not has_valid_flat_rate_transaction:
-                    # ...***... Update User Wallet and Set to None Start ...***...
-                    user_wallet_qs = UserWallet.objects.filter(user=request.user)
-                    if user_wallet_qs.exists:
+                    user_wallet_qs = UserWallet.objects.filter(user = request.user)
+                    if user_wallet_qs.exists():
                         user_wallet_qs.update(is_in_flat_plan=False, flat_plan_created_at=None)
-                    # ...***... Update User Wallet and Set to None End ...***...
-                    # ...***... Available Points Check Start ...***...
                     available_points = user_wallet_qs.first().available_points
-                    # ...***... Available Points Check End ...***...
-
-                    # ...***... Available Point is less than or not Post Weight Checking Start ...***...
                     if available_points >= post_weight:
-                        is_valid = True
-                        # ...***... Comment Create Start ...***...
-                        if request.method == 'POST':
-                            user_wallet_qs.update(available_points=(available_points - post_weight))
-                            CommentReply.objects.create(comment=comment_object,
-                                                replied_by=request.user,
-                                                reply=reply)
-                            messages.success(request, 'Reply Add Successfully!')
-                        # ...***... Comment Create End ...***...
+                        # update user wallet and deduct points
+                        user_wallet_qs.update(available_points=(available_points - post_weight))
+                        # create post
+                        CommentReply.objects.create(comment=comment_object,
+                                                    replied_by=request.user,
+                                                    reply=reply)
+                        messages.success(request, 'Reply created successfully!')
+                        return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+                    else:
+                        available_points = False
                 else:
-                    available_points = True
-                    messages.error(request, f'Please purchase points or flat rate plan to create post under this'
-                                            f' thread. This thread requires at least {post_weight} points.')
-                    # ...***... Available Point is less than or not Post Weight Checking End ...***...
-                # ...***... Is Has Flat Rate is valid ...***...
-                # ...***... Flat Rate Validation Checking Start ...***...
-            else:
-                if request.method == 'POST':
                     CommentReply.objects.create(comment=comment_object,
                                                 replied_by=request.user,
                                                 reply=reply)
-                    messages.success('Reply Add Successfully!')
-            # ...***... Flat Rate Validation Checking End ...***...
+                    messages.success(request, 'Successfully Reply Added')
+                    return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
 
-        # ...***.. When Post Weight or Thread Weight is Zero Start...***...
-
-        else:
-            is_valid = True
-            available_points = True
-            if request.method == 'POST':
+                if not has_valid_flat_rate_transaction and not available_points:
+                    messages.error(request, f'Please purchase points or flat rate plan to create post '
+                                            f'under this thread. This thread requires at least {post_weight} points.')
+                    return redirect('user_profile')
+            else:
                 CommentReply.objects.create(comment=comment_object,
                                             replied_by=request.user,
                                             reply=reply)
-                messages.success(request, 'Reply Add Successfully!')
-            # ...***.. When Post Weight or Thread Weight is Zero End ...***...
-            # ...***.. When User Wallet is not Valid Start ...***...
-    if not has_valid_flat_rate_transaction and not available_points:
-        messages.error(request, f'Please purchase points or flat rate plan to create post '
-                                f'under this thread. This thread requires at least {post_weight} points.')
-        return redirect('user_profile')
-    else:
-        messages.error(request, 'Something went wrong!')
+                messages.success(request, 'Successfully Reply Added')
+                return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+        else:
+            messages.error(request, 'Comment Not Found')
+            return redirect('user_profile')
     context = {'form': form,
                'post_qs':post_qs,
                'page_title':page_title,

@@ -355,6 +355,9 @@ def post_details(request, slug):
                 # ...***... Comment Create Start ...***...
                 if request.method == 'POST':
                     user_wallet_qs.update(available_points=(available_points - post_weight))
+                    if not comment:
+                        messages.error(request, 'Comment is Null!')
+                        return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
                     Comment.objects.create(post=post_qs,
                                            commented_by=request.user,
                                            comment=comment)
@@ -368,6 +371,9 @@ def post_details(request, slug):
         # ...***... Is Has Flat Rate is valid ...***...
         else:
             if request.method == 'POST':
+                if not comment:
+                    messages.error(request, 'Comment is Null!')
+                    return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
                 Comment.objects.create(post=post_qs,
                                        commented_by=request.user,
                                        comment=comment)
@@ -379,6 +385,9 @@ def post_details(request, slug):
         is_valid = True
         available_points = True
         if request.method == 'POST':
+            if not comment:
+                messages.error(request, 'Comment is Null!')
+                return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
             Comment.objects.create(post=post_qs,
                                    commented_by=request.user,
                                    comment=comment)

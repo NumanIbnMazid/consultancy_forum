@@ -9,12 +9,13 @@
     <thead>
         <tr>
             {% for thread in thread_lists %}
-                <th><a href="">{{ thread.title }} </a></th>
+                <th><a href="">{{ thread.title }} </a>
                     {% for post in thread.post_threads.all %}
                         <tr>
                             <td><a href="{% url 'post_details' post.slug %}">{{ post.title }} </a></td>
                         </tr>
                     {% endfor %}
+        </th>
 
             {% endfor %}
 

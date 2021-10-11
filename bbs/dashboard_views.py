@@ -564,6 +564,7 @@ class PostUpdateView(UpdateView):
         for key, value in get_post_common_contexts(request=self.request).items():
             context[key] = value
         context["update_url"] = "post_update"
+        context["create_url"] = None
         return context
 
 

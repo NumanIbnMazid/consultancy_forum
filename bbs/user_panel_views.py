@@ -337,6 +337,8 @@ def post_details(request, slug):
 
     read_more = request.POST.get('read_more')
     # print('aaaaaaaaaa',read_more)
+    already_post_read_user = post_qs.allowed_users.filter(name = request.user)
+
 
     if post_weight > 0:
         # ...***... Is In Flat Rate Checking Start ...***...
@@ -407,8 +409,10 @@ def post_details(request, slug):
                 Comment.objects.create(post=post_qs,
                                    commented_by=request.user,
                                    comment=comment)
-            post_qs.allowed_users.add(request.user)
-            messages.success(request, 'Comment Add Successfully!')
+            # ..***.. User Read Post Or Not ..***..
+            if not already_post_read_user:
+                post_qs.allowed_users.add(request.user)
+            # messages.success(request, 'Comment Add Successfully!')
     # ...***.. When Post Weight or Thread Weight is Zero End ...***...
     # ...***.. When User Wallet is not Valid Start ...***...
     if not has_valid_flat_rate_transaction and not available_points:

@@ -332,7 +332,11 @@ def post_details(request, slug):
     available_points = False
     # ...***... For Details Post Show ...***...
     is_valid = False
+    is_read_more = False
     comment = request.POST.get('comment')
+
+    read_more = request.POST.get('read_more')
+    # print('aaaaaaaaaa',read_more)
 
     if post_weight > 0:
         # ...***... Is In Flat Rate Checking Start ...***...
@@ -362,13 +366,16 @@ def post_details(request, slug):
                 # ...***... Comment Create Start ...***...
                 if request.method == 'POST':
                     user_wallet_qs.update(available_points=(available_points - post_weight))
-                    if not comment:
-                        messages.error(request, 'Comment is Null!')
-                        return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
-                    Comment.objects.create(post=post_qs,
-                                           commented_by=request.user,
-                                           comment=comment)
-                    messages.success(request, 'Comment Add Successfully!')
+                    if read_more:
+                        is_read_more = True
+                    if comment:
+                        # messages.error(request, 'Comment is Null!')
+                        # return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+                        Comment.objects.create(post=post_qs,
+                                               commented_by=request.user,
+                                               comment=comment)
+                        messages.success(request, 'Comment Add Successfully!')
+                        post_qs.allowed_users.add(request.user)
                 # ...***... Comment Create End ...***...
             else:
                 available_points = True
@@ -392,12 +399,15 @@ def post_details(request, slug):
         is_valid = True
         available_points = True
         if request.method == 'POST':
-            if not comment:
-                messages.error(request, 'Comment is Null!')
-                return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
-            Comment.objects.create(post=post_qs,
+            if read_more:
+                is_read_more = True
+            if comment:
+                # messages.error(request, 'Comment is Null!')
+                # return HttpResponseRedirect(reverse("post_details", kwargs={"slug": slug}))
+                Comment.objects.create(post=post_qs,
                                    commented_by=request.user,
                                    comment=comment)
+            post_qs.allowed_users.add(request.user)
             messages.success(request, 'Comment Add Successfully!')
     # ...***.. When Post Weight or Thread Weight is Zero End ...***...
     # ...***.. When User Wallet is not Valid Start ...***...
@@ -412,7 +422,8 @@ def post_details(request, slug):
                'available_point': available_points,
                'post_weight': post_weight,
                'user_wallet': user_wallet,
-               'is_valid':is_valid
+               'is_valid':is_valid,
+               'is_read_more':is_read_more
                }
     return render(request, 'user-panel/post-details.html', context)
 

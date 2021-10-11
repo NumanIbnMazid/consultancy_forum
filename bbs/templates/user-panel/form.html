@@ -12,7 +12,12 @@
 	</div>
 	<div class="col-md-9">
 		<div class="card card-body">
-
+<center>
+    <h3 style="color:blue"><u>Post</u></h3>
+        {% for message in messages %}
+        <h4 style="color:red">...***... {{ message }} ...***...</h4>
+        {% endfor %}
+</center>
 			<form method="POST" action="" enctype="multipart/form-data">
 				{% csrf_token %}
 				{{form.as_p}}

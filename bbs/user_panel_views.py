@@ -237,6 +237,10 @@ def create_post(request):
     if request.method == 'POST':
         user_qs = request.user
         title = request.POST.get('title')
+        post_title_qs = Post.objects.filter(title__iexact = title)
+        if post_title_qs:
+            messages.error(request, 'Post Title is Already Exists')
+            return HttpResponseRedirect(reverse("create_post"))
         thread = request.POST.get('thread')
         description = request.POST.get('description')
 
@@ -272,8 +276,9 @@ def create_post(request):
                         # update user wallet and deduct points
                         user_wallet_qs.update(available_points=(available_points - thread_weight))
                         # create post
-                        Post.objects.create(user=user_qs, title=title, thread=thread_obj,
-                                            description=description)
+                        post_qs = Post.objects.create(user=user_qs, title=title, thread=thread_obj,
+                                                      description=description)
+                        post_qs.allowed_users.add(request.user)
                         messages.success(request, 'Post created successfully!')
                         return HttpResponseRedirect(reverse('user_profile'))
                     else:
@@ -281,8 +286,9 @@ def create_post(request):
 
                 # if has valid flat rate transaction
                 else:
-                    Post.objects.create(user=user_qs, title=title, thread=thread_obj,
-                                        description=description)
+                    post_qs = Post.objects.create(user=user_qs, title=title, thread=thread_obj,
+                                                  description=description)
+                    post_qs.allowed_users.add(request.user)
                     messages.success(request, 'Successfully Post Added')
                     return HttpResponseRedirect(reverse('user_profile'))
 
@@ -293,8 +299,9 @@ def create_post(request):
 
             # if there is no weight of thread
             else:
-                Post.objects.create(user=user_qs, title=title, thread=thread_obj,
-                                    description=description)
+                post_qs = Post.objects.create(user=user_qs, title=title, thread=thread_obj,
+                                              description=description)
+                post_qs.allowed_users.add(request.user)
                 messages.success(request, 'Successfully Post Added')
                 return HttpResponseRedirect(reverse('user_profile'))
         else:

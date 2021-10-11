@@ -22,7 +22,7 @@ from .views import (
     FlatRatePlanCreateView, FlatRatePlanUpdateView, FlatRatePlanDetailView, delete_flat_rate_plan,
     # User Wallet Transaction
     UserWalletTransactionCreateView, UserWalletTransactionUpdateView, UserWalletTransactionDetailView,
-    delete_user_wallet_transaction, PostListView, PostDetailView,delete_post,
+    delete_user_wallet_transaction, PostListView, PostDetailView,delete_post,PostUpdateView
 )
 
 USER_PANEL_URLS = [
@@ -42,7 +42,7 @@ USER_PANEL_URLS = [
     #   -----------------------------*** *** ***-----------------------------
     path('create-post/', views.create_post, name='create_post'),
     path('post-details/<slug>/', views.post_details, name='post_details'),
-    path('post-update/<slug>/', views.post_update, name='post_update'),
+    path('post-update/<slug>/', views.post_update, name='update_post'),
     path('post_delete/<slug>/', views.post_delete, name='post_delete'),
     path('comment-reply/<id>/', views.comment_reply, name='comment_reply'),
     # -----------------------------*** Post list ***------------------------
@@ -77,8 +77,8 @@ DASHBOARD_PANEL_URLS = [
     # ==============================*** Post URLS ***==============================
     path("post/list/", PostListView.as_view(),
          name="post_list"),
-    # path("post/<slug>/update/", PostUpdateView.as_view(),
-    #      name="post_update"),
+    path("post/<slug>/update/", PostUpdateView.as_view(),
+         name="post_update"),
     path("post/<slug>/detail/",
          PostDetailView.as_view(), name="post_detail"),
     path("delete/cv/", delete_post,

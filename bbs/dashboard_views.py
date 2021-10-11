@@ -528,41 +528,42 @@ class PostDetailView(DetailView):
         ).get_context_data(**kwargs)
         context['page_title'] = f'Post - {self.get_object()} Detail'
         context['page_short_title'] = f'Post - {self.get_object()} Detail'
-        for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
+        for key, value in get_post_common_contexts(request=self.request).items():
             context[key] = value
 
         context["create_url"] = None
+        context['page_title'] = 'Post List'
         context["update_url"] = "post_update"
         return context
 
 
 @method_decorator(dashboard_decorators, name='dispatch')
-class UserWalletTransactionUpdateView(UpdateView):
-    template_name = 'user-wallet-transaction/manage.html'
-    form_class = UserWalletTransactionManageForm
+class PostUpdateView(UpdateView):
+    template_name = 'post/manage.html'
+    form_class = PostManageForm
 
     def get_object(self):
-        return get_simple_object(key="slug", model=UserWalletTransaction, self=self)
+        return get_simple_object(key="slug", model=Post, self=self)
 
     def get_success_url(self):
-        return reverse("create_flat_rate_plan")
+        return reverse("post_list")
 
     def form_valid(self, form):
         self.object = self.get_object()
         messages.add_message(
-            self.request, messages.SUCCESS, "User wallet transaction updated successfully!"
+            self.request, messages.SUCCESS, "Post updated successfully!"
         )
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super(
-            UserWalletTransactionUpdateView, self
+            PostUpdateView, self
         ).get_context_data(**kwargs)
-        context['page_title'] = f'Update User Wallet Transaction "{self.get_object().get_transaction_type_str()}"'
-        context['page_short_title'] = f'Update User Wallet Transaction "{self.get_object().get_transaction_type_str()}"'
-        for key, value in get_user_wallet_transaction_common_contexts(request=self.request).items():
+        context['page_title'] = f'Update Post "{self.get_object()}"'
+        context['page_short_title'] = f'Update Post "{self.get_object()}"'
+        for key, value in get_post_common_contexts(request=self.request).items():
             context[key] = value
-        context["update_url"] = None
+        context["update_url"] = "post_update"
         return context
 
 

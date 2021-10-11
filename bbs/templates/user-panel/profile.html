@@ -108,7 +108,7 @@
             <td>{{ post.weight }}</td>
             <td>{{ post.thread.weight }}</td>
             <td><a href="{% url 'post_details' post.slug %}">Details</a></td>
-            <td><a href="{% url 'post_update' post.slug %}">Update</a></td>
+            <td><a href="{% url 'update_post' post.slug %}">Update</a></td>
             <td><a href="{% url 'post_delete' post.slug %}">Delete</a></td>
         </tr>
     {% endfor %}

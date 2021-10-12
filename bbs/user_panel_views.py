@@ -344,7 +344,10 @@ def post_details(request, slug):
                 'created_at')
             # ..***.. If Flat Rate Validation Checking Start ..***..
             if flat_rate_plan_qs.exists():
-                pass
+                for user_wallet_transaction in flat_rate_plan_qs:
+                    if not user_wallet_transaction.flat_rate_plan.get_is_expired():
+                        has_valid_flat_rate_transaction = True
+                        break
             # ..***.. If Flat Rate Validation Checking End ..***..
 
             # ..***.. Point Validation Checking  Start ..***..
@@ -369,9 +372,17 @@ def post_details(request, slug):
                                                 f' thread. This thread requires at least {post_weight} points.')
                     # ..***.. If User Want to Read  Part of Post Or Comment End..***..
                 # ...***... Available Point is less than or not Post Weight Checking End ..***..
-
+            # ...***... Is Has Flat Rate is valid Start ...***...
             else:
-                print('aaaaaaaaaaaaa')
+                if request.method == 'POST':
+                    if read_more:
+                        is_read_more = True
+                    else:
+                        Comment.objects.create(post=post_qs,
+                                               commented_by=request.user,
+                                               comment=comment)
+                        messages.success(request, 'Comment Add Successfully!')
+            # ...***... Is Has Flat Rate is valid End ...***...
 
             # ..***.. Point Validation Checking  End ..***..
 
@@ -385,6 +396,7 @@ def post_details(request, slug):
                 Comment.objects.create(post=post_qs,
                                        commented_by=request.user,
                                        comment=comment)
+                messages.success(request, 'Comment Add Successfully')
     # ..***.. Check Request User is Creator of This Post Or Not End ..***..
 
     # if not has_valid_flat_rate_transaction and not available_points:

@@ -10,11 +10,13 @@
 	<hr>
 		<h3 style="text-align: center">{{ page_title }}</h3>
 		<hr>
-		{% for message in messages %}
-		<h4 style="color:red">...***... {{ message }} ...***...</h4>
-		{% endfor %}
+		{% if is_read_more == False %}
+			{% for message in messages %}
+			<h4 style="color:red">...***... {{ message }} ...***...</h4>
+			{% endfor %}
+		{% endif %}
 	</center>
-	<h2 style="color:blue">{{ post_qs.user }} | {{ post_qs.thread }} | {{ post_qs.created_at|date }} </h2>
+	<h2 style="color:blue">{{ post_qs.user }} | {{ post_qs.thread }}| Post Weight:({{ post_weight }}) | {{ post_qs.created_at|date }} </h2>
 	{% if not is_read_more %}
 	<p id="pre_text"> {{ post_qs.description|truncate_fifty_percent_word|safe }}<span id="dots"></span>
 	<form method="POST">

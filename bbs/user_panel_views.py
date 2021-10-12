@@ -315,8 +315,94 @@ def create_post(request):
 # #-----------------------------***-----------------------------
 # #------------------------ Post Details ------------------------
 # #-----------------------------***-----------------------------
+
 @login_required()
 def post_details(request, slug):
+    post_qs = Post.objects.filter(slug=slug).order_by('created_at').last()
+    form = PostManageForm(instance=post_qs)
+    user_wallet = None
+    has_valid_flat_rate_transaction = False
+    available_points = False
+    # ...***... For Comment Show ...***...
+    is_comment_show = True
+    # ...***... For Post Details  Show ...***...
+    is_read_more = False
+    comment = request.POST.get('comment')
+    read_more = request.POST.get('read_more')
+    already_post_read_user = post_qs.allowed_users.filter(name=request.user)
+    # ...***... Post Weight Check Start ...***...
+    if post_qs.weight > 0:
+        post_weight = post_qs.weight
+    else:
+        post_weight = post_qs.thread.weight
+    # ...***... Post Weight Check End...***...
+    # ..***.. Check Request User is Creator of This Post Or Not Start ..***..
+    if not already_post_read_user:
+        if post_weight > 0:
+            # ...***... Is In Flat Rate Checking Start ...***...
+            flat_rate_plan_qs = UserWalletTransaction.objects.filter(user=request.user, transaction_type=1).order_by(
+                'created_at')
+            # ..***.. If Flat Rate Validation Checking Start ..***..
+            if flat_rate_plan_qs.exists():
+                pass
+            # ..***.. If Flat Rate Validation Checking End ..***..
+
+            # ..***.. Point Validation Checking  Start ..***..
+            if not has_valid_flat_rate_transaction:
+                user_wallet_qs = UserWallet.objects.filter(user = request.user).order_by('-created_at')
+                # ...***... Update User Wallet and Set to None Start ...***...
+                if user_wallet_qs.exists():
+                    user_wallet_qs.update(is_in_flat_plan=False, flat_plan_created_at=None)
+                # ...***... Update User Wallet and Set to None End ...***...
+                # ...***... Available Points Check Start ...***...
+                available_points = user_wallet_qs.first().available_points
+                # ...***... Available Points Check End ...***...
+
+                # ...***... Available Point is less than or not Post Weight Checking Start ..***..
+                if available_points >= post_weight:
+                    pass
+                else:
+                    # ..***.. If User Want to Read  Part of Post Or Comment Start..***..
+                    if read_more or comment:
+                        is_read_more = False
+                        messages.error(request, f'Please purchase points or flat rate plan to create post under this'
+                                                f' thread. This thread requires at least {post_weight} points.')
+                    # ..***.. If User Want to Read  Part of Post Or Comment End..***..
+                # ...***... Available Point is less than or not Post Weight Checking End ..***..
+
+            else:
+                print('aaaaaaaaaaaaa')
+
+            # ..***.. Point Validation Checking  End ..***..
+
+        else:
+            print('sssssssssssssss')
+    else:
+        if request.method == 'POST':
+            if read_more:
+                is_read_more = True
+            if comment:
+                Comment.objects.create(post=post_qs,
+                                       commented_by=request.user,
+                                       comment=comment)
+    # ..***.. Check Request User is Creator of This Post Or Not End ..***..
+
+    # if not has_valid_flat_rate_transaction and not available_points:
+    #     messages.error(request, f'Please purchase points or flat rate plan to create post under this'
+    #                             f' thread. This thread requires at least {post_weight} points.')
+    #     return redirect('user_profile')
+
+    context = {'form': form, 'post_qs': post_qs,
+               'page_title': post_qs.title,
+               'available_point': available_points,
+               'post_weight': post_weight,
+               'user_wallet': user_wallet,
+               'is_comment_show': is_comment_show,
+               'is_read_more': is_read_more
+               }
+    return render(request, 'user-panel/post-details.html', context)
+@login_required()
+def post_details_dummy(request, slug):
     post_qs = Post.objects.filter(slug=slug).order_by('created_at').last()
     page_title = post_qs.title
     form = PostManageForm(instance=post_qs)
@@ -330,11 +416,11 @@ def post_details(request, slug):
 
     has_valid_flat_rate_transaction = False
     available_points = False
-    # ...***... For Details Post Show ...***...
-    is_valid = False
+    # ...***... For Comment Show ...***...
+    is_comment_show = True
+    # ...***... For Post Details  Show ...***...
     is_read_more = False
     comment = request.POST.get('comment')
-
     read_more = request.POST.get('read_more')
     already_post_read_user = post_qs.allowed_users.filter(name = request.user)
 
@@ -347,7 +433,8 @@ def post_details(request, slug):
             for user_wallet_transaction in flat_rate_plan_qs:
                 if not user_wallet_transaction.flat_rate_plan.get_is_expired():
                     has_valid_flat_rate_transaction = True
-                    is_valid = True
+                    # is_valid = True
+                    is_read_more = False
                     break
 
         # ...***... Flat Rate Validation Checking Start ...***...
@@ -363,13 +450,14 @@ def post_details(request, slug):
 
             # ...***... Available Point is less than or not Post Weight Checking Start ...***...
             if available_points >= post_weight:
-                is_valid = True
+                # is_valid = True
                 # ...***... Comment Create Start ...***...
+                is_read_more = True
                 if request.method == 'POST':
                     if not already_post_read_user:
                         user_wallet_qs.update(available_points=(available_points - post_weight))
                         post_qs.allowed_users.add(request.user)
-                    if read_more:
+                    if read_more or comment:
                         is_read_more = True
                     if comment:
                         # messages.error(request, 'Comment is Null!')
@@ -381,16 +469,23 @@ def post_details(request, slug):
                 # ...***... Comment Create End ...***...
             else:
                 available_points = True
-                if read_more:
-                    is_read_more = False
-                    messages.error(request, f'Please purchase points or flat rate plan to create post under this'
-                                        f' thread. This thread requires at least {post_weight} points.')
-                    print('bbbbbbbbbbb')
+                # is_read_more = True
+                # ..***.. when user click read more button or comment button Start ..***..
+                if read_more or comment:
+                    # ..***.. If The Post is User Own Post Read Details Permission Provided Start ..***..
+                    if already_post_read_user:
+                        is_read_more = True
+                    # ..***.. If The Post is User Own Post Read Details Permission Provided Start ..***..
+                    else:
+                        is_comment_show = False
+                        messages.error(request, f'Please purchase points or flat rate plan to create post under this'
+                                            f' thread. This thread requires at least {post_weight} points.')
+                # ..***.. when user click read more button or comment button End ..***..
             # ...***... Available Point is less than or not Post Weight Checking End ...***...
         # ...***... Is Has Flat Rate is valid ...***...
         else:
             if request.method == 'POST':
-                if read_more:
+                if read_more or comment:
                     is_read_more = True
                 if comment:
                     Comment.objects.create(post=post_qs,
@@ -401,10 +496,10 @@ def post_details(request, slug):
 
     # ...***.. When Post Weight or Thread Weight is Zero Start...***...
     else:
-        is_valid = True
+        # is_valid = True
         available_points = True
         if request.method == 'POST':
-            if read_more:
+            if read_more or comment:
                 is_read_more = True
             if comment:
                 # messages.error(request, 'Comment is Null!')
@@ -419,11 +514,15 @@ def post_details(request, slug):
     # ...***.. When Post Weight or Thread Weight is Zero End ...***...
     # ...***.. When User Wallet is not Valid Start ...***...
     if not has_valid_flat_rate_transaction and not available_points:
-        if read_more:
-            is_read_more = False
-            messages.error(request, f'Please purchase points or flat rate plan to create post '
-                                    f'under this thread. This thread requires at least {post_weight} points.')
-            print('sssssssssssssssss')
+        if read_more or comment:
+            # ..***.. If The Post is User Own Post Read Details Permission Provided Start ..***..
+            if already_post_read_user:
+                is_read_more = True
+            # ..***.. If The Post is User Own Post Read Details Permission Provided Start ..***..
+            else:
+                is_comment_show = False
+                messages.error(request, f'Please purchase points or flat rate plan to create post under this'
+                                        f' thread. This thread requires at least {post_weight} points.')
         return redirect('user_profile')
     # ...***.. When User Wallet is not Valid End ...***...
 
@@ -432,7 +531,7 @@ def post_details(request, slug):
                'available_point': available_points,
                'post_weight': post_weight,
                'user_wallet': user_wallet,
-               'is_valid':is_valid,
+               'is_comment_show':is_comment_show,
                'is_read_more':is_read_more
                }
     return render(request, 'user-panel/post-details.html', context)

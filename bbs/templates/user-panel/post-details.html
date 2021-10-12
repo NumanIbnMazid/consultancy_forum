@@ -10,14 +10,16 @@
 	<hr>
 		<h3 style="text-align: center">{{ page_title }}</h3>
 		<hr>
-		{% if is_read_more == False %}
 			{% for message in messages %}
-			<h4 style="color:red">...***... {{ message }} ...***...</h4>
+				{% if is_read_more == False %}
+					<h4 style="color:red">...***... {{ message }} ...***...</h4>
+				{% else %}
+					<h4 style="color:blue">...***... {{ message }} ...***...</h4>
+				{% endif %}
 			{% endfor %}
-		{% endif %}
 	</center>
 	<h2 style="color:blue">{{ post_qs.user }} | {{ post_qs.thread }}| Post Weight:({{ post_weight }}) | {{ post_qs.created_at|date }} </h2>
-	{% if not is_read_more %}
+	{% if is_read_more  == False %}
 	<p id="pre_text"> {{ post_qs.description|truncate_fifty_percent_word|safe }}<span id="dots"></span>
 	<form method="POST">
 		{% csrf_token %}
@@ -37,7 +39,7 @@
 				<p>reply : {{ reply.reply }}</p>
 			{% endfor %}
 			<!--	Reply Form-->
-			{% if is_valid  %}
+			{% if is_comment_show  %}
 				<form method="POST" action="{% url 'comment_reply' id=comment.id %}" enctype="multipart/form-data">
 					{% csrf_token %}
 					<textarea class="form-control" name="reply" rows="3" id="reply"></textarea>
@@ -46,7 +48,7 @@
 			{% endif %}
 		{% endfor %}
 	<hr>
-		{% if is_valid %}
+		{% if is_comment_show %}
 			<!--	Comment Form-->
 			<p>Leave a Comment</p>
 			<form method="POST" action="" enctype="multipart/form-data">

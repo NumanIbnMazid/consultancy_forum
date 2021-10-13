@@ -386,9 +386,10 @@ def post_details(request, slug):
             # ...***... Is Has Flat Rate is valid Start ...***...
             else:
                 if request.method == 'POST':
+                    post_qs.allowed_users.add(request.user)
                     if read_more:
                         is_read_more = True
-                    else:
+                    if comment:
                         Comment.objects.create(post=post_qs,
                                                commented_by=request.user,
                                                comment=comment)
@@ -398,7 +399,22 @@ def post_details(request, slug):
             # ..***.. Point Validation Checking  End ..***..
 
         else:
-            print('sssssssssssssss')
+            if request.method == 'POST':
+                post_qs.allowed_users.add(request.user)
+                if read_more:
+                    is_read_more = True
+                # ...***... Comment Create Start ...***...
+                if comment:
+                    Comment.objects.create(post=post_qs,
+                                           commented_by=request.user,
+                                           comment=comment)
+                    messages.success(request, 'Comment Add Successfully!')
+                # ...***... Comment Create End ...***...
+            # if read_more or comment:
+            #     is_read_more = True
+            #     messages.error(request, f'Please purchase points or flat rate plan to '
+            #                             f'create post under this thread. This thread'
+            #                             f' requires at least {post_weight} points.')
     else:
         if request.method == 'POST':
             if read_more:

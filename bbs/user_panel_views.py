@@ -379,6 +379,7 @@ def post_details(request, slug):
                     # ..***.. If User Want to Read  Part of Post Or Comment Start..***..
                     if read_more or comment:
                         is_read_more = False
+                        is_comment_show = False
                         messages.error(request, f'Please purchase points or flat rate plan to create post under this'
                                                 f' thread. This thread requires at least {post_weight} points.')
                     # ..***.. If User Want to Read  Part of Post Or Comment End..***..

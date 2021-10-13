@@ -37,47 +37,43 @@ class HomeView(TemplateView):
 # #-------------------- User Transaction Type ------------------
 # #-----------------------------***-----------------------------
 
-def check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs):
-    """
-    :param request, user_wallet_transaction_qs(UserWalletTransaction), user_wallet_qs(UserWallet):
-    :return: bool
-    """
-    if user_wallet_transaction_qs.transaction_type == 1:
-        is_flat_rate_plan = user_wallet_qs.last().is_in_flat_plan
-        if not is_flat_rate_plan:
-            user_point_wallet_transaction_qs = UserWalletTransaction.objects.filter(user=request.user,
-                                                                              transaction_type=0).order_by('created_at').last()
-            if not user_point_wallet_transaction_qs:
-                messages.error(request, 'Please Update Your Wallet')
-                return False
-            elif user_wallet_qs.last().available_points <= 0:
-                messages.error(request, 'You have not Available Points, Please update Your Wallet')
-                return False
-            return 'point_transaction_type'
-        today = timezone.datetime.now().date()
-        # today = 2021-12-10
-        flat_plan_created_date = user_wallet_qs.last().flat_plan_created_at
-        flat_rate_plan_qs = user_wallet_transaction_qs.flat_rate_plan
-        days = today - flat_plan_created_date.date()
-        expiration_cycle = flat_rate_plan_qs.expiration_cycle
-        if expiration_cycle == 0:
-            if days.days >=0 and days.days < 31:
-                return True
-            else:
-                user_wallet_qs.update(is_in_flat_plan=False,
-                                      flat_plan_created_at=None)
-        elif expiration_cycle == 1:
-            if days.days >= 0 and days.days < 366:
-                return True
-            else:
-                user_wallet_qs.update(is_in_flat_plan=False,
-                                flat_plan_created_at=None)
-        elif expiration_cycle == 2:
-            return True
-        else:
-            return False
-    else:
-        return 'point_transaction_type'
+# def check_user_transaction_type(request, user_wallet_transaction_qs, user_wallet_qs):
+#     if user_wallet_transaction_qs.transaction_type == 1:
+#         is_flat_rate_plan = user_wallet_qs.last().is_in_flat_plan
+#         if not is_flat_rate_plan:
+#             user_point_wallet_transaction_qs = UserWalletTransaction.objects.filter(user=request.user,
+#                                                                               transaction_type=0).order_by('created_at').last()
+#             if not user_point_wallet_transaction_qs:
+#                 messages.error(request, 'Please Update Your Wallet')
+#                 return False
+#             elif user_wallet_qs.last().available_points <= 0:
+#                 messages.error(request, 'You have not Available Points, Please update Your Wallet')
+#                 return False
+#             return 'point_transaction_type'
+#         today = timezone.datetime.now().date()
+#         # today = 2021-12-10
+#         flat_plan_created_date = user_wallet_qs.last().flat_plan_created_at
+#         flat_rate_plan_qs = user_wallet_transaction_qs.flat_rate_plan
+#         days = today - flat_plan_created_date.date()
+#         expiration_cycle = flat_rate_plan_qs.expiration_cycle
+#         if expiration_cycle == 0:
+#             if days.days >=0 and days.days < 31:
+#                 return True
+#             else:
+#                 user_wallet_qs.update(is_in_flat_plan=False,
+#                                       flat_plan_created_at=None)
+#         elif expiration_cycle == 1:
+#             if days.days >= 0 and days.days < 366:
+#                 return True
+#             else:
+#                 user_wallet_qs.update(is_in_flat_plan=False,
+#                                 flat_plan_created_at=None)
+#         elif expiration_cycle == 2:
+#             return True
+#         else:
+#             return False
+#     else:
+#         return 'point_transaction_type'
 
 # #-----------------------------***-----------------------------
 # #------------------------ User All Checking -----------------------

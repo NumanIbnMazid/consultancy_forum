@@ -40,8 +40,8 @@
 
         <th>Flat Plan</th>
         <th>{{ user_wallet_transaction.flat_rate_plan.get_expiration_cycle_str }}</th>
-        <th></th>
-        <th></th>
+        <th>Total Read Post</th>
+        <th>{{ total_post_read }}</th>
         <th></th>
         <th></th>
     </tr>
@@ -55,6 +55,7 @@
 <table>
     <thead>
         <tr>
+            <th> </th>
             <th> Name</th>
             <th> Nationality</th>
             <th> Address</th>
@@ -66,6 +67,7 @@
     <tbody>
     {% for husband in husband_lists %}
         <tr>
+            <td>{{ forloop.counter  }}</td>
             <td>{{ husband.name }}</td>
             <td>{{ husband.nationality }}</td>
             <td>{{ husband.address }}</td>
@@ -89,6 +91,7 @@
 <table style="text-align:center">
     <thead>
         <tr>
+            <th> </th>
             <th> Title</th>
             <th> Thread</th>
             <th> Description</th>
@@ -102,6 +105,7 @@
     <tbody>
     {% for post in post_lists %}
         <tr>
+            <td>{{ forloop.counter  }}</td>
             <td>{{ post.title }}</td>
             <td>{{ post.thread }}</td>
             <td>{{ post.description|truncate_word:30|safe }}</td>

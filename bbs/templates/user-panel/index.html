@@ -12,7 +12,7 @@
                 <th><a href="">{{ thread.title }} </a>
                     {% for post in thread.post_threads.all %}
                         <tr>
-                            <td><a href="{% url 'post_details' post.slug %}"><b style="color:red">{{ post.title }} | ({{ post.weight }})</b> | {{post.user}} </a></td>
+                            <td><a href="{% url 'post_details' post.slug %}"><b style="color:red"> {{ forloop.counter  }} {{ post.title }} | ({{ post.weight }})</b> | {{post.user}} </a></td>
                         </tr>
                     {% endfor %}
         </th>

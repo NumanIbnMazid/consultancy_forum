@@ -1,28 +1,56 @@
 from django import forms
 from users.models import Husband, User
 from posts.models import Post
+from django.conf import settings
+import re
+from django.core.exceptions import ValidationError
+# from util.helpers import validate_chars, simple_form_widget
 from ckeditor.widgets import CKEditorWidget
+from django.core.files.uploadedfile import UploadedFile
+from django.db.models.fields.files import ImageFieldFile
+from django.template.defaultfilters import filesizeformat
+import os
 
 # # -------------------------------------------------------------------
 # #                              User
 # # -------------------------------------------------------------------
 class UserManageForm(forms.ModelForm):
-    GENDER_CHOICES = (
-        ('', '--- Select Gender ---'),
-        (0, 'Male'),
-        (1, 'Female'),
-        (2, 'Other'),
-    )
     def __init__(self, *args, **kwargs):
         super(UserManageForm, self).__init__(*args, **kwargs)
-    gender = forms.ChoiceField(
-        choices=GENDER_CHOICES, label="Gender", initial='',
-        widget=forms.Select(), required=True
-    )
+
+        GENDER_CHOICES = (
+            ('', '--- Select Gender ---'),
+            (0, 'Male'),
+            (1, 'Female'),
+            (2, 'Other'),
+        )
+
+        gender = forms.ChoiceField(
+            choices=GENDER_CHOICES, label="Gender", initial='',
+            widget=forms.Select(), required=True
+        )
+        self.fields['marriage_experience'].widget.attrs.update({
+            'id': 'marriage_experience',
+            'placeholder': 'Enter Marriage Experience...',
+            'rows': 10,
+            'cols': 30,
+        })
+        self.fields['purpose_of_use'].widget.attrs.update({
+            'id': 'purpose_of_use',
+            'placeholder': 'Enter Purpose of Use...',
+            'rows': 10,
+            'cols': 30,
+        })
     class Meta:
         model = User
         fields = ['name','gender','contact_number','dob',
                  'address','marriage_experience','purpose_of_use']
+        widgets = {
+            'marriage_experience': CKEditorWidget(),
+        }
+        widgets = {
+            'purpose_of_use': CKEditorWidget(),
+        }
 
 # # -------------------------------------------------------------------
 # #                              Husband

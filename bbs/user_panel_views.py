@@ -382,6 +382,7 @@ def post_details(request, slug):
                                                 f' thread. This thread requires at least {post_weight} points.')
                     # ..***.. If User Want to Read  Part of Post Or Comment End..***..
                 # ...***... Available Point is less than or not Post Weight Checking End ..***..
+
             # ...***... Is Has Flat Rate is valid Start ...***...
             else:
                 if request.method == 'POST':

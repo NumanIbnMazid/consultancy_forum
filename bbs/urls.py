@@ -22,7 +22,8 @@ from .views import (
     FlatRatePlanCreateView, FlatRatePlanUpdateView, FlatRatePlanDetailView, delete_flat_rate_plan,
     # User Wallet Transaction
     UserWalletTransactionCreateView, UserWalletTransactionUpdateView, UserWalletTransactionDetailView,
-    delete_user_wallet_transaction, PostListView, PostDetailView,delete_post,PostUpdateView
+    delete_user_wallet_transaction, PostListView, PostDetailView,delete_post,PostUpdateView,
+    FAQCreateView,FAQDetailView, FAQUpdateView, delete_faq
 )
 
 USER_PANEL_URLS = [
@@ -76,14 +77,15 @@ DASHBOARD_PANEL_URLS = [
     path("user-wallet-transaction/<slug>/detail/", UserWalletTransactionDetailView.as_view(), name="user_wallet_transaction_detail"),
     path("delete/user-wallet-transaction/", delete_user_wallet_transaction, name="delete_user_wallet_transaction"),
     # ==============================*** Post URLS ***==============================
-    path("post/list/", PostListView.as_view(),
-         name="post_list"),
-    path("post/<slug>/update/", PostUpdateView.as_view(),
-         name="post_update"),
-    path("post/<slug>/detail/",
-         PostDetailView.as_view(), name="post_detail"),
-    path("delete/cv/", delete_post,
-         name="delete_post"),
+    path("post/list/", PostListView.as_view(), name="post_list"),
+    path("post/<slug>/update/", PostUpdateView.as_view(), name="post_update"),
+    path("post/<slug>/detail/",PostDetailView.as_view(), name="post_detail"),
+    path("delete/cv/", delete_post, name="delete_post"),
+    # ==============================*** FAQ URLS ***==============================
+    path("create-faq", FAQCreateView.as_view(), name="create_faq"),
+    path("faq-update/<slug>/", FAQUpdateView.as_view(), name="update_faq"),
+    path("faq/<slug>/detail/", FAQDetailView.as_view(), name="faq_detail"),
+    path("delete/faq/", delete_faq, name="delete_faq"),
 ]
 urlpatterns = [
     # For handling Static Files in Debug False Mode

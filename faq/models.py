@@ -33,9 +33,13 @@ class FAQ(models.Model):
     def __str__(self):
         return self.question_title
 
+    def get_fields(self):
+        return [get_dynamic_fields(field, self) for field in self.__class__._meta.fields]
+
+
 # # FAQ
 
 def faq_slug_pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
-        instance.slug = unique_slug_generator(instance=instance, field=instance.title)
+        instance.slug = unique_slug_generator(instance=instance, field=instance.question_title)
 pre_save.connect(faq_slug_pre_save_receiver, sender=FAQ)

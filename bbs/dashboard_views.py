@@ -14,6 +14,8 @@ from posts.forms import (ThreadManageForm, PostManageForm)
 # Plans
 from plans.forms import (
     PointPlanManageForm, FlatRatePlanManageForm, UserWalletTransactionManageForm)
+# FAQ
+from faq.forms import ( FAQManageForm )
 # *** Models Import ***
 # Posts
 from posts.models import (Thread, Post)
@@ -580,4 +582,108 @@ def delete_post(request):
 # ............................... *** ...............................
 # ............................... FAQ ...............................
 # ............................... *** ...............................
+def get_faq_common_contexts(request):
+    common_contexts = get_simple_context_data(
+        request=request, app_namespace=None, model_namespace="faq", model=FAQ, list_template=None, fields_to_hide_in_table=["id", "slug"]
+    )
+    return common_contexts
 
+@method_decorator(dashboard_decorators, name='dispatch')
+class FAQCreateView(CreateView):
+    template_name = "dashboard/snippets/manage.html"
+    form_class = FAQManageForm
+
+    def form_valid(self, form, **kwargs):
+        question_title = form.instance.question_title
+        field_qs = FAQ.objects.filter(
+            question_title__iexact=question_title
+        )
+        result = validate_normal_form(
+            field='question_title', field_qs=field_qs,
+            form=form, request=self.request
+        )
+        if result == 1:
+            return super().form_valid(form)
+        else:
+            return super().form_invalid(form)
+
+    def get_success_url(self):
+        return reverse("create_faq")
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            FAQCreateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = 'Create FAQ'
+        context['page_short_title'] = 'Create FAQ'
+        for key, value in get_faq_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class FAQDetailView(DetailView):
+    template_name = "dashboard/snippets/detail-common.html"
+
+    def get_object(self):
+        return get_simple_object(key='slug', model=FAQ, self=self)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            FAQDetailView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'FAQ - {self.get_object().question_title} Detail'
+        context['page_short_title'] = f'FAQ - {self.get_object().question_title} Detail'
+        for key, value in get_faq_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class FAQUpdateView(UpdateView):
+    template_name = 'dashboard/snippets/manage.html'
+    form_class = FAQManageForm
+
+    def get_object(self):
+        return get_simple_object(key="slug", model=FAQ, self=self)
+
+    def get_success_url(self):
+        return reverse("create_faq")
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        question_title = form.instance.question_title
+        if not self.object.question_title == question_title:
+            field_qs = FAQ.objects.filter(
+                question_title__iexact=question_title
+            )
+            result = validate_normal_form(
+                field='question_title', field_qs=field_qs,
+                form=form, request=self.request
+            )
+            if result == 1:
+                return super().form_valid(form)
+            else:
+                return super().form_invalid(form)
+
+        messages.add_message(
+            self.request, messages.SUCCESS, "FAQ Updated Successfully!"
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            FAQUpdateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'Update FAQ "{self.get_object().question_title}"'
+        context['page_short_title'] = f'Update FAQ "{self.get_object().question_title}"'
+        for key, value in get_faq_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@csrf_exempt
+@has_dashboard_permission_required
+@login_required
+def delete_faq(request):
+    return delete_simple_object(request=request, key='slug', model=FAQ, redirect_url="create_faq")

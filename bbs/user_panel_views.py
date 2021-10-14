@@ -1,7 +1,9 @@
 from django.views.generic import TemplateView
-
+# models import
 from plans.models import UserWalletTransaction
 from users.models import Husband, UserWallet, User
+from faq.models import FAQ
+
 from django.http import HttpResponse, HttpResponseNotFound
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -621,4 +623,15 @@ def post_list(request, slug):
     post_lists = Post.objects.filter(thread = thread_qs)
     context = {'page_title':thread_qs.title,
                'thread_qs':thread_qs, 'post_lists':post_lists}
+    return render(request, 'user-panel/post_list.html', context)
+
+# #-----------------------------***-----------------------------
+# #------------------------ All FAQ List ------------------------
+# #-----------------------------***-----------------------------
+
+def faq_list(request):
+    faq_lists = FAQ.objects.filter(is_active = True)
+    context = {
+        'faq_lists':faq_lists
+    }
     return render(request, 'user-panel/post_list.html', context)

@@ -27,3 +27,13 @@
     </tbody>
 </table>
 {% endif %}
+
+{% if faq_lists %}
+<center>
+    <h3 style="color:red"><u>FAQ</u></h3>
+</center>
+{% for faq in faq_lists %}
+<h3 style="background-color:gray; padding:1%; color:#fff;">+ {{ faq.question_title }}</h3>
+<p>{{ faq.answer|safe }}</p>
+{% endfor %}
+{% endif %}

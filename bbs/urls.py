@@ -50,6 +50,7 @@ USER_PANEL_URLS = [
     # -----------------------------*** Post list ***------------------------
     #   -----------------------------*** *** ***-----------------------------
     path('post_list/<slug>/', views.post_list, name='post_list'),
+    path('faq-list/', views.faq_list, name='faq_list'),
 ]
 
 DASHBOARD_PANEL_URLS = [

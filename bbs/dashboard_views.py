@@ -19,6 +19,8 @@ from plans.forms import (
 from posts.models import (Thread, Post)
 # Plans
 from plans.models import (PointPlan, FlatRatePlan, UserWalletTransaction)
+# FAQ
+from faq.models import FAQ
 
 dashboard_decorators = [login_required, has_dashboard_permission_required]
 
@@ -573,3 +575,9 @@ class PostUpdateView(UpdateView):
 @login_required
 def delete_post(request):
     return delete_simple_object(request=request, key='slug', model=Post, redirect_url="post_list")
+
+
+# ............................... *** ...............................
+# ............................... FAQ ...............................
+# ............................... *** ...............................
+

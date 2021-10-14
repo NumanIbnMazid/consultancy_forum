@@ -45,7 +45,8 @@ LOCAL_APPS = [
     'users',
     'posts',
     'plans',
-    'utils'
+    'utils',
+    'faq'
 ]
 
 INSTALLED_APPS = [

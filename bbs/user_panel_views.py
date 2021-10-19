@@ -635,3 +635,6 @@ def faq_list(request):
         'faq_lists':faq_lists
     }
     return render(request, 'user-panel/post_list.html', context)
+
+def chat(request):
+    return render(request, 'user-panel/pre_header.html')

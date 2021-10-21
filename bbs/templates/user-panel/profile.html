@@ -118,7 +118,13 @@
     {% endfor %}
     </tbody>
 </table>
-
-
+	<form method="POST">
+		{% csrf_token %}
+		<input name='msg' type="hidden", value="msg">
+        <script type="text/javascript">
+        document.write('Chat ADDDDDDDDD')
+        window.$crisp=[];window.CRISP_WEBSITE_ID="53ede6ee-a11f-4a01-a4af-0527be4ae40b";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
+        </script>
+        <button type="submit" id="myBtn"></button>
+    </form>
 {% endif %}
-

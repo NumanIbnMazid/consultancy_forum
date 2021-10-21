@@ -146,6 +146,7 @@ def user_wallet_update(request, user_wallet_qs, post_weight):
 @login_required()
 def user_profile(request):
     page_title = request.user.username
+    msg = request.POST.get('msg')
     husband_lists = Husband.objects.filter(user  = request.user)
     post_lists = Post.objects.filter(user = request.user)
     total_post_read = Post.objects.filter(allowed_users = request.user).count()
@@ -325,6 +326,8 @@ def post_details(request, slug):
     available_points = False
     # ...***... For Comment Show ...***...
     is_comment_show = True
+    # ...***... For Chat Box Show ...***...
+    is_chat_show = False
     # ...***... For Post Details  Show ...***...
     is_read_more = False
     comment = request.POST.get('comment')
@@ -363,6 +366,7 @@ def post_details(request, slug):
 
                 # ...***... Available Point is less than or not Post Weight Checking Start ..***..
                 if available_points >= post_weight:
+                    is_chat_show = True
                     if request.method == 'POST':
                         user_wallet_qs.update(available_points =(available_points-post_weight))
                         post_qs.allowed_users.add(request.user)
@@ -387,6 +391,7 @@ def post_details(request, slug):
 
             # ...***... Is Has Flat Rate is valid Start ...***...
             else:
+                is_chat_show = True
                 if request.method == 'POST':
                     post_qs.allowed_users.add(request.user)
                     if read_more:
@@ -401,8 +406,11 @@ def post_details(request, slug):
             # ..***.. Point Validation Checking  End ..***..
 
         else:
+            # ...**... For Chat Box Show Start ...**...
+            is_chat_show = True
+            # ...**... For Chat Box Show End ...**...
             if request.method == 'POST':
-                post_qs.allowed_users.add(request.user)
+                # post_qs.allowed_users.add(request.user)
                 if read_more:
                     is_read_more = True
                 # ...***... Comment Create Start ...***...
@@ -413,6 +421,7 @@ def post_details(request, slug):
                     messages.success(request, 'Comment Add Successfully!')
                 # ...***... Comment Create End ...***..
     else:
+        is_chat_show = True
         if request.method == 'POST':
             if read_more:
                 is_read_more = True
@@ -434,7 +443,8 @@ def post_details(request, slug):
                'post_weight': post_weight,
                'user_wallet': user_wallet,
                'is_comment_show': is_comment_show,
-               'is_read_more': is_read_more
+               'is_read_more': is_read_more,
+               'is_chat_show':is_chat_show,
                }
     return render(request, 'user-panel/post-details.html', context)
 
@@ -571,7 +581,7 @@ def comment_reply(request, id):
                     # ...***... Point Validation Checking End ...***...
                 # ..***.. Post Weight is 0 Reply & Comment Add Start ..***..
                 else:
-                    post_qs.allowed_users.add(request.user)
+                    # post_qs.allowed_users.add(request.user)
                     if read_more:
                         is_read_more = True
                     if reply:
@@ -610,12 +620,13 @@ def comment_reply(request, id):
             return redirect('user_profile')
     context = {'post_qs':post_qs,
                'page_title':page_title,
+               'post_weight':post_weight,
                'is_comment_show':is_comment_show,
                'is_read_more':is_read_more}
     return render(request, 'user-panel/post-details.html', context)
 
 # #-----------------------------***-----------------------------
-# #------------------------ All Post List ------------------------
+# #------------------------ All Post List ----------------------
 # #-----------------------------***-----------------------------
 
 def post_list(request, slug):

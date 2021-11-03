@@ -444,9 +444,9 @@ def post_details(request, slug):
     #     is_chat_show = False
 
     # For Chat Option
-    message_list = Message.objects.filter(Q(sender = request.user)| Q(receiver = request.user)|
-                                          Q(receiver = post_qs.user),
-                                          room=slug, ).order_by('created_at')[0:25]
+    message_list = Message.objects.filter((Q(sender = request.user)|Q(receiver = request.user)) and
+                                          (Q(sender = post_qs.user)|Q(receiver = post_qs.user)) ,
+                                          ).order_by('created_at')[0:25]
     user = request.user.id
     user_name = request.user
     receiver_id = post_qs.user.id

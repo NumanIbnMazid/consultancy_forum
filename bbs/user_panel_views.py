@@ -445,7 +445,8 @@ def post_details(request, slug):
 
     # For Chat Option
     message_list = Message.objects.filter((Q(sender = request.user)|Q(receiver = request.user)) and
-                                          (Q(sender = post_qs.user)|Q(receiver = post_qs.user)) ,
+                                          (Q(sender = post_qs.user)|Q(receiver = post_qs.user)),
+                                          room = slug
                                           ).order_by('created_at')[0:25]
     user = request.user.id
     user_name = request.user

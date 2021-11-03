@@ -666,20 +666,3 @@ def faq_list(request):
     }
     return render(request, 'user-panel/post_list.html', context)
 
-
-@login_required()
-def room(request, post_title):
-    post_qs = Post.objects.filter(title = post_title).last()
-    user = request.user.id
-    user_name = request.user
-    receiver_id = post_qs.user.id
-    messages = Message.objects.filter(room=post_title )[0:25]
-    context ={
-        'post_qs':post_qs,
-        'user': user,
-        'messages':messages,
-        'receiver_id':receiver_id,
-        'room_name': post_title,
-        'user_name': user_name
-            }
-    return render(request, 'user-panel/p_post_details.html', context)

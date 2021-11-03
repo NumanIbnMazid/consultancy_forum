@@ -51,7 +51,6 @@ USER_PANEL_URLS = [
     #   -----------------------------*** *** ***-----------------------------
     path('post_list/<slug>/', views.post_list, name='post_list'),
     path('faq-list/', views.faq_list, name='faq_list'),
-    # path('<str:post_title>/', views.room, name='room'),
 ]
 
 DASHBOARD_PANEL_URLS = [

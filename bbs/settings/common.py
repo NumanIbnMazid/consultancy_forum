@@ -39,6 +39,7 @@ THIRD_PARTY_APPS = [
     'debug_toolbar',
     # Django Select 2
     'django_select2',
+    'channels',
 ]
 
 LOCAL_APPS = [
@@ -46,7 +47,8 @@ LOCAL_APPS = [
     'posts',
     'plans',
     'utils',
-    'faq'
+    'faq',
+    'chat',
 ]
 
 INSTALLED_APPS = [
@@ -137,6 +139,20 @@ MEDIA_ROOT = os.path.join(
 SITE_ID = 1
 ROOT_URLCONF = 'bbs.urls'
 WSGI_APPLICATION = 'bbs.wsgi.application'
+# For Channel Asgi Application Start
+ASGI_APPLICATION = 'bbs.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        }
+    }
+}
+# For Channel Asgi Application End
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 HOME_URL = "/"
 INTERNAL_IPS = [

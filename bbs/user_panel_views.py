@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from plans.models import UserWalletTransaction
 from users.models import Husband, UserWallet, User
 from faq.models import FAQ
+from chat.models import Message
 
 from django.http import HttpResponse, HttpResponseNotFound
 from django.http import HttpResponseRedirect
@@ -17,6 +18,8 @@ from django.views import View
 from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+
+from django.db.models import Q
 
 # #-----------------------------***-----------------------------
 # #---------------------------- Home ---------------------------
@@ -437,6 +440,16 @@ def post_details(request, slug):
     #                             f' thread. This thread requires at least {post_weight} points.')
     #     return redirect('user_profile')
 
+    # if post_qs.user == request.user:
+    #     is_chat_show = False
+
+    # For Chat Option
+    message_list = Message.objects.filter(Q(sender = request.user)| Q(receiver = request.user)|
+                                          Q(receiver = post_qs.user),
+                                          room=slug, ).order_by('created_at')[0:25]
+    user = request.user.id
+    user_name = request.user
+    receiver_id = post_qs.user.id
     context = {'form': form, 'post_qs': post_qs,
                'page_title': post_qs.title,
                'available_point': available_points,
@@ -445,6 +458,12 @@ def post_details(request, slug):
                'is_comment_show': is_comment_show,
                'is_read_more': is_read_more,
                'is_chat_show':is_chat_show,
+               # For Chat Option
+               'user':user,
+               'message_list':message_list,
+               'receiver_id':receiver_id,
+               'room_name': slug,
+               'user_name': user_name
                }
     return render(request, 'user-panel/post-details.html', context)
 
@@ -646,3 +665,21 @@ def faq_list(request):
         'faq_lists':faq_lists
     }
     return render(request, 'user-panel/post_list.html', context)
+
+
+@login_required()
+def room(request, post_title):
+    post_qs = Post.objects.filter(title = post_title).last()
+    user = request.user.id
+    user_name = request.user
+    receiver_id = post_qs.user.id
+    messages = Message.objects.filter(room=post_title )[0:25]
+    context ={
+        'post_qs':post_qs,
+        'user': user,
+        'messages':messages,
+        'receiver_id':receiver_id,
+        'room_name': post_title,
+        'user_name': user_name
+            }
+    return render(request, 'user-panel/p_post_details.html', context)

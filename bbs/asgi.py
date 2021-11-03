@@ -3,6 +3,11 @@ from pathlib import Path
 import environ
 from django.core.asgi import get_asgi_application
 
+# CHANNEL
+from channels.routing import ProtocolTypeRouter, URLRouter
+import bbs.routing
+from channels.auth import AuthMiddlewareStack
+
 # ******* Reading Project Environment *******
 ENV_FILE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -15,4 +20,13 @@ elif env.bool('IS_PRODUCTION', default='') == False and env.bool('IS_STAGING', d
 else:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bbs.settings.development')
 
-application = get_asgi_application()
+# FOR CHANNEL
+# application = get_asgi_application()
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            bbs.routing.websocket_urlpatterns
+        )
+    )
+})

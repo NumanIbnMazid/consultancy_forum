@@ -96,4 +96,3 @@ class PostManageForm(forms.ModelForm):
         widgets = {
             'description': CKEditorWidget(),
         }
-

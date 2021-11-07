@@ -5,12 +5,36 @@
     <div class="customizer-content">
         <!-- Customizer header -->
         <div class="customizer-header px-2 pt-1 pb-0 position-relative">
-            <h4 class="mb-0">BBS Theme Customizer</h4>
+            <h4 class="mb-0">BBS Web Customizer</h4>
             <p class="m-0">Customize & Preview in Real Time</p>
 
             <a class="customizer-close" href="javascript:void(0);"><i data-feather="x"></i></a>
         </div>
 
+        <hr />
+
+        <!-- Auto Translation -->
+        <div class="customizer-menu px-2">
+            <p class="font-weight-bold">Translation</p>
+            <div id="" class="d-flex mb-1">
+                <p class="font-weight-bold mr-auto m-0">Allow Translation</p>
+                <div class="custom-control custom-control-primary custom-switch">
+                    <input type="checkbox" class="custom-control-input translation-config"
+                        {% if dashboard_setting.allow_translation == True %}checked{% endif %}
+                        id="translation-config" />
+                    <label class="custom-control-label" for="translation-config"></label>
+                </div>
+            </div>
+            <div id="" class="d-flex">
+                <p class="font-weight-bold mr-auto m-0">Allow Auto Translation</p>
+                <div class="custom-control custom-control-primary custom-switch">
+                    <input type="checkbox" class="custom-control-input auto-translation-config"
+                        {% if dashboard_setting.allow_auto_translation == True %}checked{% endif %}
+                        id="auto-translation-config" />
+                    <label class="custom-control-label" for="auto-translation-config"></label>
+                </div>
+            </div>
+        </div>
         <hr />
 
         <!-- Styling & Text Direction -->

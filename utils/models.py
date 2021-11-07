@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from bbs.utils import autoslugFromUUID
 
+
 class DashboardSetting(models.Model):
 
     class Skin(models.TextChoices):
@@ -54,6 +55,8 @@ class DashboardSetting(models.Model):
     footer_type = models.CharField(
         max_length=100, choices=FooterType.choices, default="footer-fixed", blank=True, null=True
     )
+    allow_auto_translation = models.BooleanField(default=True)
+    allow_translation = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='created at')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='updated at')
 
@@ -107,7 +110,7 @@ class DashboardSetting(models.Model):
 class BBStranslation(models.Model):
     english_version = models.TextField()
     japanese_version = models.TextField()
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, max_length=254)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

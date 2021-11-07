@@ -1,11 +1,26 @@
 from django.shortcuts import render
-from django.views.generic import View
+from django.views.generic import View, CreateView, UpdateView, DetailView
 from django.http import JsonResponse
-from .models import DashboardSetting
+from .models import DashboardSetting, BBStranslation
+from .forms import BBStranslationManageForm
+from bbs.decorators import has_dashboard_permission_required
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
+from django.contrib import messages
+from bbs.helpers import (
+    validate_normal_form, get_simple_context_data, get_simple_object, delete_simple_object
+)
 from django.utils import timezone
 import json
 
 
+
+dashboard_decorators = [login_required, has_dashboard_permission_required]
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
 class DashboardSettingView(View):
 
     def post(self, *args, **kwargs):
@@ -23,7 +38,7 @@ class DashboardSettingView(View):
                 """
                 # define available keys
                 available_keys = ["skin-config", "menu-collapsed-config", "layout-width-config",
-                                "navbar-color-config", "navbar-type-config", "footer-type-config"]
+                                  "navbar-color-config", "navbar-type-config", "footer-type-config", "translation-config", "auto-translation-config"]
 
                 # get setting key
                 setting_key = dashboard_setting.get("key", [])
@@ -68,6 +83,14 @@ class DashboardSettingView(View):
                         dashboard_setting_qs.update(
                             footer_type=setting_value, updated_at=timezone.now()
                         )
+                    elif setting_key == "translation-config":
+                        dashboard_setting_qs.update(
+                            allow_translation=bool(setting_value), updated_at=timezone.now()
+                        )
+                    elif setting_key == "auto-translation-config":
+                        dashboard_setting_qs.update(
+                            allow_auto_translation=bool(setting_value), updated_at=timezone.now()
+                        )
                     else:
                         dashboard_setting_qs.update(
                             title="Dashboard", updated_at=timezone.now()
@@ -80,3 +103,95 @@ class DashboardSettingView(View):
             except Exception as E:
                 return JsonResponse({"valid": False, "Exception": str(E)}, status=400)
         return JsonResponse({}, status=400)
+
+
+""" 
+-------------------------------------------------------------------
+                           ** BBStranslation ***
+-------------------------------------------------------------------
+"""
+
+
+def get_translation_common_contexts(request):
+    common_contexts = get_simple_context_data(
+        request=request, app_namespace="utils", model_namespace="translation", model=BBStranslation, list_template=None, fields_to_hide_in_table=["id", "slug"]
+    )
+    return common_contexts
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class BBStranslationCreateView(CreateView):
+    template_name = "dashboard/snippets/manage.html"
+    form_class = BBStranslationManageForm
+
+    def form_valid(self, form, **kwargs):
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        messages.add_message(
+            self.request, messages.SUCCESS, "Translation Created Successfully!"
+        )
+        return reverse("utils:create_translation")
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            BBStranslationCreateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = 'Create Translation'
+        context['page_short_title'] = 'Create Translation'
+        for key, value in get_translation_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class BBStranslationDetailView(DetailView):
+    template_name = "dashboard/snippets/detail-common.html"
+
+    def get_object(self):
+        return get_simple_object(key='slug', model=BBStranslation, self=self)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            BBStranslationDetailView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'Translation Detail'
+        context['page_short_title'] = f'Translation Detail'
+        for key, value in get_translation_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@method_decorator(dashboard_decorators, name='dispatch')
+class BBStranslationUpdateView(UpdateView):
+    template_name = 'dashboard/snippets/manage.html'
+    form_class = BBStranslationManageForm
+
+    def get_object(self):
+        return get_simple_object(key="slug", model=BBStranslation, self=self)
+
+    def get_success_url(self):
+        return reverse("utils:create_translation")
+
+    def form_valid(self, form):
+        messages.add_message(
+            self.request, messages.SUCCESS, "Translation Updated Successfully!"
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(
+            BBStranslationUpdateView, self
+        ).get_context_data(**kwargs)
+        context['page_title'] = f'Update Translation'
+        context['page_short_title'] = f'Update Translation'
+        for key, value in get_translation_common_contexts(request=self.request).items():
+            context[key] = value
+        return context
+
+
+@csrf_exempt
+@has_dashboard_permission_required
+@login_required
+def delete_translation(request):
+    return delete_simple_object(request=request, key='slug', model=BBStranslation, redirect_url="utils:create_translation")

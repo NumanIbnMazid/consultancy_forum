@@ -7,6 +7,7 @@ from bbs.utils import simple_random_string, unique_slug_generator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from bbs.helpers import get_dynamic_fields
+from bbs.utils import autoslugFromUUID
 
 
 def generate_username_from_email(email):
@@ -41,6 +42,7 @@ class UserManager(BaseUserManager):
         return user
 
 
+@autoslugFromUUID()
 class User(AbstractBaseUser, PermissionsMixin):
 
     class Gender(models.IntegerChoices):
@@ -58,9 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         max_length=254, unique=True
     )
-    slug = models.SlugField(
-        unique=True
-    )
+    slug = models.SlugField(unique=True, max_length=254)
     name = models.CharField(
         max_length=254, null=True, blank=True
     )
@@ -130,20 +130,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 @receiver(pre_save, sender=User)
-def update_username_and_slug_from_email(sender, instance, **kwargs):
+def update_username_from_email(sender, instance, **kwargs):
     """ Generates and updates username from user email and updates slug on User pre_save hook """
     instance.username = generate_username_from_email(email=instance.email)
-    if not instance.slug:
-        instance.slug = simple_random_string()
 
 
+@autoslugFromUUID()
 class UserWallet(models.Model):
     user = models.OneToOneField(
         get_user_model(), on_delete=models.CASCADE, related_name="user_wallet_user"
     )
-    slug = models.SlugField(
-        unique=True
-    )
+    slug = models.SlugField(unique=True, max_length=254)
     available_points = models.PositiveIntegerField(
         default=0
     )
@@ -169,14 +166,6 @@ class UserWallet(models.Model):
         return self.user.get_dynamic_username()
 
 
-def user_wallet_slug_pre_save_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = simple_random_string()
-
-
-pre_save.connect(user_wallet_slug_pre_save_receiver, sender=UserWallet)
-    
-
 @receiver(post_save, sender=User)
 def assign_user_wallet_on_post_save(sender, instance, **kwargs):
     """ Assigns Wallet to User on User post_save hook """
@@ -192,13 +181,12 @@ def assign_user_wallet_on_post_save(sender, instance, **kwargs):
         )
 
 
+@autoslugFromUUID()
 class Husband(models.Model):
     user = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name="husband_users"
     )
-    slug = models.SlugField(
-        unique=True
-    )
+    slug = models.SlugField(unique=True, max_length=254)
     name = models.CharField(
         max_length=100
     )
@@ -253,11 +241,3 @@ class UserCostTransaction(models.Model):
 
     def get_fields(self):
         return [get_dynamic_fields(field, self) for field in self.__class__._meta.fields]
-
-
-def husband_slug_pre_save_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = unique_slug_generator(
-            instance=instance, field=instance.name
-        )
-pre_save.connect(husband_slug_pre_save_receiver, sender=Husband)

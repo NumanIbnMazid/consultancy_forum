@@ -23,6 +23,7 @@ from posts.models import (Thread, Post)
 from plans.models import (PointPlan, FlatRatePlan, UserWalletTransaction)
 # FAQ
 from faq.models import FAQ
+# translator
 from .utils import translate_to_jp
 
 

@@ -1,11 +1,8 @@
 from django.db import models
 from bbs.helpers import get_dynamic_fields
-from bbs.utils import (
-    unique_slug_generator
-)
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.models.signals import post_save, pre_save
+from bbs.utils import autoslugFromUUID
 
 
 """ 
@@ -14,13 +11,13 @@ from django.db.models.signals import post_save, pre_save
 -------------------------------------------------------------------
 """
 
+
+@autoslugFromUUID()
 class Thread(models.Model):
     title = models.CharField(
         max_length=254, unique=True
     )
-    slug = models.SlugField(
-        unique=True
-    )
+    slug = models.SlugField(unique=True, max_length=254)
     weight = models.PositiveIntegerField(
         default=0, blank=True, null=True, verbose_name="thread weight"
     )
@@ -50,13 +47,13 @@ class Thread(models.Model):
 # #                             Post
 # # -------------------------------------------------------------------
 
+
+@autoslugFromUUID()
 class Post(models.Model):
     title = models.CharField(
         max_length=255
     )
-    slug = models.SlugField(
-        unique=True
-    )
+    slug = models.SlugField(unique=True, max_length=254)
     user = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name="post_users"
     )
@@ -104,6 +101,7 @@ class Post(models.Model):
 # # -------------------------------------------------------------------
 # #                           Post Comment
 # # -------------------------------------------------------------------
+
 
 class Comment(models.Model):
     post = models.ForeignKey(
@@ -179,29 +177,3 @@ class CommentReply(models.Model):
             else:
                 return (field.name, field.value_from_object(self), field.get_internal_type())
         return [get_dynamic_fields(field) for field in self.__class__._meta.fields]
-
-
-# # -------------------------------------------------------------------
-# #                  Pre-Save Post-Save Configurations
-# # -------------------------------------------------------------------
-
-
-# # Thread
-
-def thread_slug_pre_save_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = unique_slug_generator(instance=instance, field=instance.title)
-
-
-pre_save.connect(thread_slug_pre_save_receiver, sender=Thread)
-
-
-
-# # Post
-
-def thread_slug_pre_save_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = unique_slug_generator(instance=instance, field=instance.title)
-
-
-pre_save.connect(thread_slug_pre_save_receiver, sender=Post)

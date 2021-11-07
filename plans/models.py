@@ -1,17 +1,13 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db.models import CheckConstraint, Q
-from bbs.helpers import get_dynamic_fields
-from bbs.utils import (
-    unique_slug_generator, simple_random_string
-)
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save, pre_delete, post_delete
+from django.db.models.signals import post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from users.models import UserWallet
 from django.utils import timezone
-import datetime
+from bbs.utils import autoslugFromUUID
 
 
 """ 
@@ -21,6 +17,7 @@ import datetime
 """
 
 
+@autoslugFromUUID()
 class PointPlan(models.Model):
     class Currency(models.IntegerChoices):
         YEN = 0, _("Yen")
@@ -28,9 +25,7 @@ class PointPlan(models.Model):
     title = models.CharField(
         max_length=254, unique=True
     )
-    slug = models.SlugField(
-        unique=True
-    )
+    slug = models.SlugField(unique=True, max_length=254)
     point = models.PositiveIntegerField(
         default=0
     )
@@ -88,6 +83,7 @@ class PointPlan(models.Model):
 """
 
 
+@autoslugFromUUID()
 class FlatRatePlan(models.Model):
     class Currency(models.IntegerChoices):
         YEN = 0, _("Yen")
@@ -100,9 +96,7 @@ class FlatRatePlan(models.Model):
     title = models.CharField(
         max_length=254, unique=True
     )
-    slug = models.SlugField(
-        unique=True
-    )
+    slug = models.SlugField(unique=True, max_length=254)
     price = models.FloatField(
         default=0, validators=[MinValueValidator(0.0)]
     )
@@ -182,6 +176,8 @@ class FlatRatePlan(models.Model):
 -------------------------------------------------------------------
 """
 
+
+@autoslugFromUUID()
 class UserWalletTransaction(models.Model):
     class TransactionType(models.IntegerChoices):
         POINT = 0, _("Point")
@@ -190,9 +186,7 @@ class UserWalletTransaction(models.Model):
     user = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name="user_wallet_transaction_users"
     )
-    slug = models.SlugField(
-        unique=True
-    )
+    slug = models.SlugField(unique=True, max_length=254)
     transaction_type = models.PositiveSmallIntegerField(
         default=0, choices=TransactionType.choices
     )
@@ -241,40 +235,6 @@ class UserWalletTransaction(models.Model):
 # # -------------------------------------------------------------------
 # #                  Pre-Save Post-Save Configurations
 # # -------------------------------------------------------------------
-
-
-# # PointPlan
-
-def point_plan_slug_pre_save_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = unique_slug_generator(
-            instance=instance, field=instance.title
-        )
-
-
-pre_save.connect(point_plan_slug_pre_save_receiver, sender=PointPlan)
-
-
-# # FlatRatePlan
-
-def flat_rate_plan_slug_pre_save_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = unique_slug_generator(
-            instance=instance, field=instance.title
-        )
-
-
-pre_save.connect(flat_rate_plan_slug_pre_save_receiver, sender=FlatRatePlan)
-
-
-# # UserWalletTransaction
-
-def user_wallet_transaction_slug_pre_save_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = simple_random_string()
-
-
-pre_save.connect(user_wallet_transaction_slug_pre_save_receiver, sender=UserWalletTransaction)
 
 
 @receiver(post_save, sender=UserWalletTransaction)

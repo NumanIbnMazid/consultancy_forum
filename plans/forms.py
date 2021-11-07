@@ -1,6 +1,7 @@
 from django import forms
 from plans.models import PointPlan, FlatRatePlan, UserWalletTransaction
 from django_select2 import forms as s2forms
+from bbs.utils import translate_to_jp
 
 
 """ 
@@ -16,7 +17,7 @@ class PointPlanManageForm(forms.ModelForm):
         super(PointPlanManageForm, self).__init__(*args, **kwargs)
 
         self.fields['title'].widget.attrs.update({
-            'placeholder': 'Enter Point Plan Title...',
+            'placeholder': translate_to_jp('Enter Point Plan Title...'),
             'maxlength': 150
         })
 

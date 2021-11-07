@@ -4,10 +4,7 @@
 {% if form.visible_fields %}
 <div class="text-center mb-4">
     <small class="text-muted">
-        {{'Please fill the'|translate_to_jp}} <span class="text-danger"><i>{{'required'|translate_to_jp}}</i></span>
-        {{'fields properly'|translate_to_jp}}
-        {{'marked with'|translate_to_jp}} <span
-            class="text-danger">*</span>
+        {{ 'Please fill the required fields properly marked with *'|translate_to_jp }}
     </small>
 </div>
 {% endif %}
@@ -63,9 +60,9 @@
                         <div class="extra_info" id="{{field.name}}_extra_info"></div>
                         <!-- main input -->
                         {% if field.field.widget.input_type == "checkbox" %}
-                        {{ field|translate_to_jp|add_class:'checkbox' }}
+                        {{ field|add_class:'checkbox' }}
                         {% else %}
-                        {{ field|translate_to_jp|add_class:'form-control' }}
+                        {{ field|add_class:'form-control' }}
                         {% endif %}
 
 

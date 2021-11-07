@@ -67,7 +67,6 @@ def autoslugFromUUID():
 
 
 def translate_to_jp(value):
-    
     def dashboard_setting():
         dashboard_setting_qs = utils.models.DashboardSetting.objects.all()
         if not dashboard_setting_qs.exists():
@@ -81,7 +80,7 @@ def translate_to_jp(value):
     
     try:
         if dashboard_setting.allow_translation:
-            bbs_translation_qs = utils.models.BBSTranslation.objects.filter(
+            bbs_translation_qs = utils.models.BBStranslation.objects.filter(
                 english_version__iexact=value
             )
             if bbs_translation_qs.exists():

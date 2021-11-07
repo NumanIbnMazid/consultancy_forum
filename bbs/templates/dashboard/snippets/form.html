@@ -1,11 +1,13 @@
 {% load widget_tweaks %}
+{% load custom_tags %}
 
 {% if form.visible_fields %}
 <div class="text-center mb-4">
     <small class="text-muted">
-        Please fill the <span class="text-danger"><i>required</i></span> (marked with <span
-            class="text-danger">*</span>)
-        fields properly
+        {{'Please fill the'|translate_to_jp}} <span class="text-danger"><i>{{'required'|translate_to_jp}}</i></span>
+        {{'fields properly'|translate_to_jp}}
+        {{'marked with'|translate_to_jp}} <span
+            class="text-danger">*</span>
     </small>
 </div>
 {% endif %}
@@ -16,12 +18,13 @@
 <div class="alert alert-danger" role="alert">
     {% for error in hidden_field.errors %}
     <p class="text-danger font-italic">
-        <strong>(Hidden field {{ hidden_field.name }}) {{ error }}</strong>
+        <strong>{{'Hidden field'|translate_to_jp}} {{ hidden_field.name|translate_to_jp }}
+            {{ error|translate_to_jp }}</strong>
     </p>
     {% endfor %}
 </div>
 {% endif %}
-{{ hidden_field }}
+{{ hidden_field|translate_to_jp }}
 {% endfor %}
 
 {% if form.non_field_errors %}
@@ -29,7 +32,7 @@
 <div class="alert alert-danger" role="alert">
     {% for error in form.non_field_errors %}
     <p class="text-danger">
-        <strong>{{ error }}</strong>
+        <strong>{{ error|translate_to_jp }}</strong>
     </p>
     {% endfor %}
 </div>
@@ -44,7 +47,8 @@
             <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6 text-right">
                 <label for="{{ field.id_for_label }}" class="control-label" id="{{ field.id_for_label }}-label">
 
-                    <span class="font-17 font-weight-bold" id="{{field.name}}-label">{{ field.label |title }}</span>
+                    <span class="font-17 font-weight-bold"
+                        id="{{field.name}}-label">{{ field.label|title|translate_to_jp }}</span>
 
                     {% if field.field.required %}
                     <small class="text-danger"> *</small>
@@ -59,16 +63,16 @@
                         <div class="extra_info" id="{{field.name}}_extra_info"></div>
                         <!-- main input -->
                         {% if field.field.widget.input_type == "checkbox" %}
-                        {{ field|add_class:'checkbox' }}
+                        {{ field|translate_to_jp|add_class:'checkbox' }}
                         {% else %}
-                        {{ field|add_class:'form-control' }}
+                        {{ field|translate_to_jp|add_class:'form-control' }}
                         {% endif %}
 
 
                         <!-- select all button -->
                         {% if field.name == "permissions" or field.name == "user_group" %}
                         <div id="{{field.name}}_select-all" class="text-center m-2">
-                            <a href="#" class="select-all-btn btn btn-sm btn-primary">Select All</a>
+                            <a href="#" class="select-all-btn btn btn-sm btn-primary">{{'Select All'|translate_to_jp}}</a>
                         </div>
                         {% endif %}
 
@@ -82,8 +86,9 @@
                     </div>
                     <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
                         {% if field.help_text %}
-                        <span class="label ml-2" data-toggle="tooltip" title="{{ field.help_text|safe }}"
-                            data-original-title="{{ field.help_text|safe }}">
+                        <span class="label ml-2" data-toggle="tooltip"
+                            title="{{ field.help_text|translate_to_jp|safe }}"
+                            data-original-title="{{ field.help_text|translate_to_jp|safe }}">
                             <i class="fa fa-exclamation-circle"></i>
                         </span>
                         {% endif %}
@@ -96,7 +101,7 @@
                 <div class="row form-error-div">
                     <b class="col-md-12 text-danger">
                         <span id="{{field.name}}_error" class="form-error">
-                            {{ error|safe }}
+                            {{ error|translate_to_jp|safe }}
                         </span>
                     </b>
                 </div>

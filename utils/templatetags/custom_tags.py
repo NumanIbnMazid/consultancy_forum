@@ -112,7 +112,7 @@ def translate_to_jp(value):
     try:
         if dashboard_setting.allow_translation:
             bbs_translation_qs = BBStranslation.objects.filter(
-                english_version=value
+                english_version__iexact=value
             )
             if bbs_translation_qs.exists():
                 return bbs_translation_qs.last().japanese_version

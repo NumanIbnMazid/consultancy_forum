@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DashboardSetting
+from .models import DashboardSetting, BBStranslation
 
 
 class DashboardSettingAdmin(admin.ModelAdmin):
@@ -11,3 +11,9 @@ class DashboardSettingAdmin(admin.ModelAdmin):
 
 
 admin.site.register(DashboardSetting, DashboardSettingAdmin)
+
+class BBStranslationAdmin(admin.ModelAdmin):
+    list_display = ['id','english_version','japanese_version']
+    class Meta:
+        model = BBStranslation
+admin.site.register(BBStranslation, BBStranslationAdmin)

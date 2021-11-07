@@ -117,11 +117,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 """ *** Localization Configuration *** """
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+USE_TRANSLATION = True
+
 
 """ *** Static & Media Files Configurations *** """
 STATIC_URL = '/static/'

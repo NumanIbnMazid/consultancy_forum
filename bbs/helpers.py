@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.shortcuts import render
 from middlewares.middlewares import RequestMiddleware
 from django.core.paginator import Paginator
+from .utils import translate_to_jp
 
 
 """
@@ -68,16 +69,16 @@ def validate_normal_form(field, field_qs, form, request):
         if field_qs.exists():
             form.add_error(
                 field, forms.ValidationError(
-                    f"This {field} is already exists! Please try another one."
+                    translate_to_jp(f"This {field} is already exists! Please try another one.")
                 )
             )
             return 0
     if 'update' in request.path or 'edit' in request.path:
-        dynamic_msg = "Updated Successfully !!!"
+        dynamic_msg = translate_to_jp("Updated Successfully !!!")
     elif 'create' in request.path or 'add' in request.path:
-        dynamic_msg = "Created Successfully !!!"
+        dynamic_msg = translate_to_jp("Created Successfully !!!")
     else:
-        dynamic_msg = "Manipulated Successfully !!!"
+        dynamic_msg = translate_to_jp("Manipulated Successfully !!!")
     messages.add_message(
         request, messages.SUCCESS,
         dynamic_msg
@@ -103,7 +104,7 @@ def get_simple_object(key='slug', model=None, self=None):
             slug = self.kwargs['slug']
             instance = model.objects.get(slug=slug)
     except model.DoesNotExist:
-        raise Http404('Not found!!!')
+        raise Http404(translate_to_jp('Not found!!!'))
     except model.MultipleObjectsReturned:
         if key == 'id':
             id = self.kwargs['id']
@@ -112,7 +113,7 @@ def get_simple_object(key='slug', model=None, self=None):
             slug = self.kwargs['slug']
             instance = model.objects.filter(slug=slug).first()
     except:
-        raise Http404("Something went wrong !!!")
+        raise Http404(translate_to_jp("Something went wrong !!!"))
     return instance
 
 
@@ -137,14 +138,14 @@ def delete_simple_object(request, key, model, redirect_url):
         if qs.exists():
             qs.delete()
             messages.add_message(request, messages.SUCCESS,
-                                 "Deleted successfully!")
+                                 translate_to_jp("Deleted successfully!"))
             if redirect_url is not None:
                 url = reverse(redirect_url)
             else:
                 url = request.META.get('HTTP_REFERER', '/')
         else:
             messages.add_message(request, messages.WARNING,
-                                 "Not found!")
+                                 translate_to_jp("Not found!"))
     return HttpResponseRedirect(url)
 
 
@@ -197,7 +198,7 @@ def get_simple_context_data(request=None, app_namespace=None, model_namespace=No
 
     if request == None or model_namespace == None or model == None:
         raise ValueError(
-            "request, model_namespace and model cannot be null! Please pass these arguments properly."
+            translate_to_jp("request, model_namespace and model cannot be null! Please pass these arguments properly.")
         )
     
     permission_namespace = get_permission_namespace(model_namespace)
@@ -275,12 +276,12 @@ def validate_chars(field_data, allowed_chars=None, max_length=50):
             allowed_chars = re.match(allowed_chars, field_data)
             if not allowed_chars:
                 raise forms.ValidationError(
-                    f"Only [{pattern}] these characters are allowed!"
+                    translate_to_jp(f"Only [{pattern}] these characters are allowed!")
                 )
         length = len(field_data)
         if length > max_length:
             raise forms.ValidationError(
-                f"Maximum {max_length} characters allowed. Currently using {length}!"
+                translate_to_jp(f"Maximum {max_length} characters allowed. Currently using {length}!")
             )
     return field_data
 

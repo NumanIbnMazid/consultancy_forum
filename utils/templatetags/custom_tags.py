@@ -1,5 +1,7 @@
 from django import template
 from utils.models import DashboardSetting
+from deep_translator import GoogleTranslator
+from django.conf import settings
 
 
 register = template.Library()
@@ -91,3 +93,10 @@ def user_has_perm(context, permission):
 def to_title(value):
     result = value.replace("_", " ").title()
     return result
+
+
+@register.filter
+def translate_to_jp(value):
+    if settings.USE_TRANSLATION:
+        value = GoogleTranslator(source='auto', target='ja').translate(value)
+    return value

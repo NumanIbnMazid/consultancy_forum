@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from bbs.utils import autoslugFromUUID
 
 class DashboardSetting(models.Model):
 
@@ -101,3 +102,24 @@ class DashboardSetting(models.Model):
         else:
             return "footer footer-light footer-static d-none"
 
+
+@autoslugFromUUID()
+class BBStranslation(models.Model):
+    english_version = models.TextField()
+    japanese_version = models.TextField()
+    slug = models.SlugField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = ("BBS Translation")
+        verbose_name_plural = ("BBS Translations")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.english_version
+
+    def get_fields(self):
+        def get_dynamic_fields(field):
+            return (field.name, field.value_from_object(self), field.get_internal_type())
+        return [get_dynamic_fields(field) for field in self.__class__._meta.fields]

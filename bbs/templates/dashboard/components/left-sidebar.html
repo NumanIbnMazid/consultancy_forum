@@ -1,3 +1,5 @@
+{% load custom_tags %}
+
 <div class="main-menu menu-fixed {{ dashboard_setting.get_menu_class }} menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
@@ -21,37 +23,37 @@
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="{% url 'dashboard' %}">
                     <i class="fas fa-tachometer-alt"></i>
-                    <span class="menu-title text-truncate" data-i18n="Dashboard">Dashboard</span>
+                    <span class="menu-title text-truncate" data-i18n="Dashboard">{{ 'Dashboard'|translate_to_jp }}</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="{% url 'create_thread' %}">
                     <i class="fas fa-align-justify"></i>
-                    <span class="menu-title text-truncate" data-i18n="Threads">Threads</span>
+                    <span class="menu-title text-truncate" data-i18n="Threads">{{ 'Threads'|translate_to_jp }}</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="{% url 'post_list' %}">
                     <i class="fas fa-sticky-note"></i>
-                    <span class="menu-title text-truncate" data-i18n="Threads">Posts</span>
+                    <span class="menu-title text-truncate" data-i18n="Threads">{{ 'Posts'|translate_to_jp }}</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="#">
                     <i data-feather="layout"></i>
-                    <span class="menu-title text-truncate" data-i18n="Collapsable Menu">Plans</span>
+                    <span class="menu-title text-truncate" data-i18n="Collapsable Menu">{{ 'Plans'|translate_to_jp }}</span>
                 </a>
                 <ul class="menu-content">
                     <li>
                         <a class="d-flex align-items-center" href="{% url 'create_point_plan' %}">
                             <i class="fas fa-coins"></i>
-                            <span class="menu-item text-truncate" data-i18n="Point Plans">Point Plans</span>
+                            <span class="menu-item text-truncate" data-i18n="Point Plans">{{ 'Point Plans'|translate_to_jp }}</span>
                         </a>
                     </li>
                     <li>
                         <a class="d-flex align-items-center" href="{% url 'create_flat_rate_plan' %}">
                             <i class="fas fa-dollar-sign"></i>
-                            <span class="menu-item text-truncate" data-i18n="Point Plans">Flat Rate Plans</span>
+                            <span class="menu-item text-truncate" data-i18n="Point Plans">{{ 'Flat Rate Plans'|translate_to_jp }}</span>
                         </a>
                     </li>
                 </ul>
@@ -59,13 +61,13 @@
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="{% url 'create_user_wallet_transaction' %}">
                     <i class="fas fa-money-check"></i>
-                    <span class="menu-title text-truncate" data-i18n="User Wallet Transaction">User Wallet Transaction</span>
+                    <span class="menu-title text-truncate" data-i18n="User Wallet Transaction">{{ 'User Wallet Transaction'|translate_to_jp }}</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="{% url 'create_faq' %}">
                     <i class="fas fa-question-circle"></i>
-                    <span class="menu-title text-truncate" data-i18n="FAQ">FAQ</span>
+                    <span class="menu-title text-truncate" data-i18n="FAQ">{{ 'FAQ'|translate_to_jp }}</span>
                 </a>
             </li>
         </ul>

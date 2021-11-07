@@ -1,3 +1,4 @@
+{% load custom_tags %}
 {% if messages %}
 
 {% comment %}
@@ -38,7 +39,7 @@
                     //== Sweetalert Demo 4
                     $(document).ready(function (e) {
                         swal({
-                            title: "{{ message.tags }}!".toUpperCase(),
+                            title: "{{ message.tags|translate_to_jp }}!".toUpperCase(),
                             text: "{{ message|safe }}",
                             icon: "{{ message.tags }}",
                             buttons: {

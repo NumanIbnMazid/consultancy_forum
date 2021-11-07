@@ -23,6 +23,8 @@ from posts.models import (Thread, Post)
 from plans.models import (PointPlan, FlatRatePlan, UserWalletTransaction)
 # FAQ
 from faq.models import FAQ
+from .utils import translate_to_jp
+
 
 dashboard_decorators = [login_required, has_dashboard_permission_required]
 
@@ -34,6 +36,8 @@ class DashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
         context["page_title"] = "Dashboard"
+
+        context['test_data'] = "Dashboard, Posts, Threads"
         return context
 
 

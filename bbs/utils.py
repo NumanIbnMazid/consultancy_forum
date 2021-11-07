@@ -2,6 +2,11 @@ import random
 import string
 import time
 from django.utils.text import slugify
+from deep_translator import GoogleTranslator
+from django.conf import settings
+from django.dispatch import receiver
+from django.db import models
+import uuid
 
 
 def random_string_generator(size=4, chars=string.ascii_lowercase + string.digits):
@@ -43,3 +48,24 @@ def unique_slug_generator(instance=None, field=None, new_slug=None):
         )
         return unique_slug_generator(instance, new_slug=new_slug)
     return slug
+
+
+def autoslugFromUUID():
+    def decorator(model):
+        assert hasattr(model, "slug"), "Model is missing a slug field"
+
+        @receiver(models.signals.pre_save, sender=model, weak=False)
+        def generate_slug(sender, instance, *args, raw=False, **kwargs):
+            if not raw and not instance.slug:
+                try:
+                    instance.slug = str(uuid.uuid4())
+                except Exception as e:
+                    instance.slug = simple_random_string()
+        return model
+    return decorator
+
+
+def translate_to_jp(value):
+    if settings.USE_TRANSLATION:
+        value = GoogleTranslator(source='auto', target='ja').translate(value)
+    return value

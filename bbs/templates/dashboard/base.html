@@ -47,9 +47,9 @@
 
             <!-- BEGIN: Breadcrumb -->
             {% if page_title %}
-            {% include "dashboard/components/breadcrumb.html" with page_title=page_title %}
+            {% include "dashboard/components/breadcrumb.html" with page_title=page_title|translate_to_jp %}
             {% else %}
-            {% include "dashboard/components/breadcrumb.html" with page_title="BBS" %}
+            {% include "dashboard/components/breadcrumb.html" with page_title='BBS'|translate_to_jp %}
             {% endif %}
             <!-- END: Breadcrumb -->
 

@@ -97,7 +97,7 @@ def to_title(value):
 
 @register.filter
 def translate_to_jp(value):
-    
+    # print(value)
     def dashboard_setting():
         dashboard_setting_qs = DashboardSetting.objects.all()
         if not dashboard_setting_qs.exists():
@@ -123,5 +123,5 @@ def translate_to_jp(value):
     except Exception as e:
         print(f"Exception: {str(e)}")
         return value
-        
+
     return value

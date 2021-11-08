@@ -1,11 +1,15 @@
+{% load custom_tags %}
 <div class="sidenav-overlay"></div>
 <div class="drag-target"></div>
 <footer class="{{ dashboard_setting.get_footer_type }}">
     <p class="clearfix mb-0">
-        <span class="float-md-left d-block d-md-inline-block mt-25">COPYRIGHT &copy; {% now "F Y" %}
-            <a class="ml-25" href="#" target="_blank">Company</a>
-            <span class="d-none d-sm-inline-block">, All rights Reserved</span>
-        </span>
+<!--        <span class="float-md-left d-block d-md-inline-block mt-25">COPYRIGHT &copy; {% now "F Y" %}-->
+<!--            <a class="ml-25" href="#" target="_blank">Company</a>-->
+<!--            <span class="d-none d-sm-inline-block">, All rights Reserved</span>-->
+<!--        </span>-->
+        <strong>
+            {{ 'COPYRIGHT © November 2021 Company , All rights Reserved'|translate_to_jp }}
+        </strong>
         {% comment %}
         <span class="float-md-right d-none d-md-block">
             <i data-feather="heart"></i>

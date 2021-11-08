@@ -10,7 +10,7 @@
 {% block page_title %}
 {{ page_title }}
 {% endblock %}
-
+{% load custom_tags %}
 
 <!-- main content -->
 {% block content %}
@@ -26,7 +26,7 @@
             {% comment %}
             <div class="card-header">
                 <h3 class="card-title">
-                    {{ page_title }}
+                    {{ page_title|translate_to_jp }}
                 </h3>
             </div>
             {% endcomment %}
@@ -41,7 +41,7 @@
 
                 <div class="card-footer">
                     <button type="submit" class="btn btn-primary">
-                        Submit
+                        {{ 'Submit'|translate_to_jp }}
                     </button>
                 </div>
             </form>

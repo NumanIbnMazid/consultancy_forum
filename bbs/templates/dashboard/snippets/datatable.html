@@ -13,9 +13,9 @@
             <div class="card-header border-0 text-center">
                 <h3 class="mb-0">
                     {% if not display_name == None %}
-                    {{ display_name }} List
+                    {{ display_name|translate_to_jp }} {{ 'List'|translate_to_jp }}
                     {% else %}
-                    {{ namespace|to_title }} List
+                    {{ namespace|to_title|translate_to_jp }} {{ 'List'|translate_to_jp }}
                     {% endif %}
                 </h3>
             </div>
@@ -26,12 +26,12 @@
                     <thead class="">
                         <tr class="text-center">
                             {% if not update_url == None or not detail_url == None or not delete_url == None %}
-                            <th>Action</th>
+                            <th>{{ 'Action'|translate_to_jp }}</th>
                             {% endif %}
                             <th>#</th>
                             {% for key, value in fields.items %}
                             {% if not key in fields_to_hide_in_table %}
-                            <th>{{ value|remove_id|title }}</th>
+                            <th>{{ value|remove_id|title|translate_to_jp }}</th>
                             {% endif %}
                             {% endfor %}
                         </tr>
@@ -47,7 +47,7 @@
                             <th width="10">
                                 <button class="btn btn-secondary btn-sm" type="button" data-toggle="collapse"
                                     data-target="#actionCollapse_{{forloop.counter}}" aria-expanded="false" aria-controls="actionCollapse_{{forloop.counter}}">
-                                    Actions
+                                    {{ 'Actions'|translate_to_jp }}
                                 </button>
                                 <div class="collapse mt-2" id="actionCollapse_{{forloop.counter}}">
                                     <!-- update url -->
@@ -141,7 +141,7 @@
 
                             {% elif field_type in 'TextField' %}
                             <td>
-                                {{ value|truncate_word:30|remove_html_tags }}
+                                {{ value|truncate_word:30|remove_html_tags|translate_to_jp }}
                             </td>
 
                             {% else %}
@@ -149,7 +149,7 @@
                             {% if value == None or value == "" %}
                             <td>--</td>
                             {% else %}
-                            <td>{{ value }}</td>
+                            <td>{{ value|translate_to_jp }}</td>
                             {% endif %}
                             {% endif %}
 
@@ -162,7 +162,7 @@
                         <tr>
                             <td colspan="{{ fields_count }}" class="text-center">
                                 <div class="alert alert-info">
-                                    No item found!
+                                    {{ 'No item found!'|translate_to_jp }}
                                 </div>
                             </td>
                         </tr>
@@ -173,12 +173,12 @@
                     <tfoot class="">
                         <tr class="text-center">
                             {% if not update_url == None or not detail_url == None or not delete_url == None %}
-                            <th>Action</th>
+                            <th>{{ 'Action'|translate_to_jp }}</th>
                             {% endif %}
                             <th>#</th>
                             {% for key, value in fields.items %}
                             {% if not key in fields_to_hide_in_table %}
-                            <th>{{ value|remove_id|title }}</th>
+                            <th>{{ value|remove_id|title|translate_to_jp }}</th>
                             {% endif %}
                             {% endfor %}
                         </tr>

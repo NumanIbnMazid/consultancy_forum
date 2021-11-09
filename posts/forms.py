@@ -1,6 +1,7 @@
 from django import forms
 from posts.models import Thread, Post
 from ckeditor.widgets import CKEditorWidget
+from bbs.utils import translate_to_jp
 
 """ 
 -------------------------------------------------------------------
@@ -15,7 +16,7 @@ class ThreadManageForm(forms.ModelForm):
         super(ThreadManageForm, self).__init__(*args, **kwargs)
 
         self.fields['title'].widget.attrs.update({
-            'placeholder': 'Enter Thread Title...',
+            'placeholder': translate_to_jp('Enter Thread Title...'),
             'maxlength': 150
         })
 

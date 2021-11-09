@@ -55,7 +55,7 @@
                 {% if create_url %}
                 <button type="button" class="btn btn-md text-deco-none btn btn-outline-primary js_create_{{namespace}}"
                     data-toggle="modal" data-target="#modal-create-{{namespace}}">
-                    + {{ page_title }}
+                    + {{ page_titletranslate_to_jp }}
                 </button>
                 {% endif %}
             </div>
@@ -88,7 +88,7 @@
         <div class="card card-primary">
             {% comment %}
             <h4 class="card-title text-center mt-4 font-15 font-bold">
-                {{ namespace|title }} List
+                {{ namespace|title|translate_to_jp }} {{ 'List'|translate_to_jp }}
             </h4>
             {% endcomment %}
             <div class="card-body">

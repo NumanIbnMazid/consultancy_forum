@@ -94,7 +94,7 @@ def to_title(value):
     result = value.replace("_", " ").title()
     return result
 
-
+# {{ ''|translate_to_jp }}
 @register.filter
 def translate_to_jp(value):
     # print(value)

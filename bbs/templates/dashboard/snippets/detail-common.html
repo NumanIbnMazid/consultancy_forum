@@ -25,7 +25,7 @@
 <div class="card">
     <div class="card-header">
         <h4 class="card-title text-center">
-            <span class="">{{ page_title }}</span>
+            <span class="">{{ page_title|translate_to_jp }}</span>
         </h4>
         {% if not list_url == None or not create_url == None or not update_url == None or not delete_url == None %}
         <div class="text-center">
@@ -87,12 +87,13 @@
                                 <div class="row m-3">
                                     <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6 col-2 text-right">
                                         <span class="text-dark font-bold">
-                                            Title
+                                           {{ 'Title'|translate_to_jp }}
                                         </span>
                                     </div>
                                     <div class="col-xl-10 col-lg-10 col-md-9 col-sm-8 col-xs-6 col-10">
                                         <span class="text-dark font-bold ml-2">
-                                            Value
+
+                                            {{ 'Value'|translate_to_jp }}
                                         </span>
                                     </div>
                                 </div>
@@ -103,7 +104,7 @@
                             <td class="font-normal">
                                 <div class="row m-3">
                                     <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-6 col-2 text-right">
-                                        <span class="font-bold font-15">{{ label|to_title }}</span>
+                                        <span class="font-bold font-15">{{ label|to_title|translate_to_jp }}</span>
                                     </div>
                                     <div class="col-xl-10 col-lg-10 col-md-9 col-sm-8 col-xs-6 col-10">
                                         <div class="ml-2">
@@ -139,12 +140,12 @@
 
                                             <!-- start text-fields -->
                                             {% elif field_type in 'TextField' %}
-                                            {{ value|safe|linebreaks }}
+                                            {{ value|safe|linebreaks|translate_to_jp }}
                                             {% else %}
                                             <!-- end text-fields -->
 
                                             <!-- start fields -->
-                                            {{ value }}
+                                            {{ value|translate_to_jp }}
                                             <!-- end fields -->
 
                                             {% endif %}

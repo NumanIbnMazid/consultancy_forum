@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.db.models.fields.files import ImageFieldFile
 from django.template.defaultfilters import filesizeformat
 import os
-
+from bbs.utils import translate_to_jp
 # # -------------------------------------------------------------------
 # #                              FAQ
 # # -------------------------------------------------------------------
@@ -14,11 +14,11 @@ class FAQManageForm(forms.ModelForm):
         super(FAQManageForm, self).__init__(*args, **kwargs)
 
         self.fields['question_title'].widget.attrs.update({
-            'placeholder': 'Enter FAQ Title'
+            'placeholder': translate_to_jp('Enter FAQ Title')
         })
         self.fields['answer'].widget.attrs.update({
             'id': 'answer',
-            'placeholder': 'Enter FAQ Answer...',
+            'placeholder': translate_to_jp('Enter FAQ Answer...'),
             'rows': 10,
             'cols': 30,
         })

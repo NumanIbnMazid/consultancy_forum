@@ -40,7 +40,7 @@ class FlatRatePlanManageForm(forms.ModelForm):
         super(FlatRatePlanManageForm, self).__init__(*args, **kwargs)
 
         self.fields['title'].widget.attrs.update({
-            'placeholder': 'Enter Flat Rate Plan Title...',
+            'placeholder': translate_to_jp('Enter Flat Rate Plan Title...'),
             'maxlength': 150
         })
 
@@ -69,6 +69,11 @@ class UserWalletTransactionManageForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(UserWalletTransactionManageForm, self).__init__(*args, **kwargs)
+
+        # self.fields['user'].widget.attrs.update({
+        #     'placeholder': 'Search User Name or Email or Contact Number...',
+        #     'maxlength': 150
+        # })
 
     class Meta:
         model = UserWalletTransaction

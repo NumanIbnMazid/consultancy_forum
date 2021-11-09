@@ -97,7 +97,9 @@ def to_title(value):
 # {{ ''|translate_to_jp }}
 @register.filter
 def translate_to_jp(value):
-    # print(value)
+    # print(len(value))
+    # str.length == 5000
+    # print(len(value))
     def dashboard_setting():
         dashboard_setting_qs = DashboardSetting.objects.all()
         if not dashboard_setting_qs.exists():

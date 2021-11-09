@@ -2,7 +2,7 @@ from django.db import models
 from bbs.helpers import get_dynamic_fields
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from bbs.utils import autoslugFromUUID
+from bbs.utils import autoslugFromUUID, translate_to_jp
 
 
 """ 

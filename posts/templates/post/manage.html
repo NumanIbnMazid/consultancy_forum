@@ -55,7 +55,7 @@
                 {% if create_url %}
                 <button type="button" class="btn btn-md text-deco-none btn btn-outline-primary js_create_{{namespace}}"
                     data-toggle="modal" data-target="#modal-create-{{namespace}}">
-                    + {{ page_titletranslate_to_jp }}
+                    + {{ page_title|translate_to_jp }}
                 </button>
                 {% endif %}
             </div>
@@ -63,13 +63,13 @@
             <div class="ml-2">
 
                 {% if not create_url == None and can_add_change == True %}
-                <a href="{% url create_url %}" class="btn btn-primary">
+                <a href="" class="btn btn-primary">
                     <i class="fas fa-plus"></i>
                 </a>
                 {% endif %}
 
                 {% if not list_url == None and can_view == True %}
-                <a href="{% url list_url %}" class="btn btn-primary" alt="Show List">
+                <a href="" class="btn btn-primary" alt="Show List">
                     <i class="fas fa-list"></i>
                 </a>
                 {% endif %}

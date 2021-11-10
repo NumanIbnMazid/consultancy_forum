@@ -54,7 +54,6 @@ USER_PANEL_URLS = [
 ]
 
 DASHBOARD_PANEL_URLS = [
-    path("post_json_response/", views.post_json_response, name="post_json_response"),
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     # ==============================*** UTILS URLS ***==============================
     path("utils/", include(("utils.urls", "utils"), namespace="utils")),

@@ -28,16 +28,11 @@ from .utils import translate_to_jp
 
 # For Json Response
 from django.http import JsonResponse
-import json
+import json,requests, time
+from django.shortcuts import render, redirect
 
 
 dashboard_decorators = [login_required, has_dashboard_permission_required]
-
-
-def post_json_response(request):
-    post_qs = Post.objects.all()
-    post_list = list(post_qs.values())
-    return JsonResponse(post_list, safe=False)
 
 
 @method_decorator(dashboard_decorators, name='dispatch')

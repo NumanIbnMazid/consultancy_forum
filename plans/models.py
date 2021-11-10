@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from users.models import UserWallet
 from django.utils import timezone
-from bbs.utils import autoslugFromUUID
+from bbs.utils import autoslugFromUUID, translate_to_jp
 
 
 """ 
@@ -67,7 +67,7 @@ class PointPlan(models.Model):
 
     def get_currency_icon_class(self):
         if self.currency == 1:
-            return "fas fa-dollar-sign"
+            return "<i class='fas fa-dollar-sign'></i>"
         return "<i class='fas fa-yen-sign'></i>"
 
     def get_currency_str(self):
@@ -140,13 +140,13 @@ class FlatRatePlan(models.Model):
 
     def get_currency_icon_class(self):
         if self.currency == 1:
-            return "fas fa-dollar-sign"
+            return "<i class='fas fa-dollar-sign'></i>"
         return "<i class='fas fa-yen-sign'></i>"
 
     def get_currency_str(self):
         if self.currency == 1:
-            return "USD"
-        return "YEN"
+            return 'USD'
+        return 'YEN'
 
     def get_expiration_cycle_str(self):
         if self.expiration_cycle == 1:

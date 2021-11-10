@@ -20,6 +20,12 @@ class PointPlanManageForm(forms.ModelForm):
             'placeholder': translate_to_jp('Enter Point Plan Title...'),
             'maxlength': 150
         })
+    CURRENCY_CHOICES = (
+        (0, translate_to_jp('Yen')),
+        (1, translate_to_jp('Dollar'))
+    )
+    currency = forms.ChoiceField(
+        required=False, help_text='Select your Currency.', choices=CURRENCY_CHOICES)
 
     class Meta:
         model = PointPlan
@@ -43,6 +49,19 @@ class FlatRatePlanManageForm(forms.ModelForm):
             'placeholder': translate_to_jp('Enter Flat Rate Plan Title...'),
             'maxlength': 150
         })
+    CURRENCY_CHOICES = (
+        (0, translate_to_jp('Yen')),
+        (1, translate_to_jp('Dollar'))
+    )
+    EXPIRATION_CYCLE_CHOICES = (
+        (0, translate_to_jp('Monthly')),
+        (1, translate_to_jp('Yearly')),
+        (1, translate_to_jp('Lifetime'))
+    )
+    currency = forms.ChoiceField(
+       help_text='Select your Currency.', choices=CURRENCY_CHOICES)
+    expiration_cycle = forms.ChoiceField(
+         help_text='Select your Expiration Cycle.', choices=EXPIRATION_CYCLE_CHOICES)
 
     class Meta:
         model = FlatRatePlan

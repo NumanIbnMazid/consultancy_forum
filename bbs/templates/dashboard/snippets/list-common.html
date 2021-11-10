@@ -52,7 +52,7 @@
                         <thead class="thead-dark">
                             <tr class="text-center">
                                 {% if not update_url == None or not detail_url == None or not delete_url == None %}
-                                <th>Action</th>
+                                <th>{{ 'Action'|translate_to_jp }}</th>
                                 {% endif %}
                                 <th>#</th>
                                 {% for key, value in fields.items %}

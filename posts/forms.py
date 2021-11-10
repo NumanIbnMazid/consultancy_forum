@@ -38,7 +38,7 @@ class PostManageForm(forms.ModelForm):
         super(PostManageForm, self).__init__(*args, **kwargs)
 
         self.fields['weight'].widget.attrs.update({
-            'placeholder': 'Enter Post Weight...',
+            'placeholder': translate_to_jp('Enter Post Weight...',)
         })
 
     class Meta:

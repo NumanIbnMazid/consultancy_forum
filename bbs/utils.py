@@ -67,30 +67,30 @@ def autoslugFromUUID():
 
 
 def translate_to_jp(value):
-    def dashboard_setting():
-        dashboard_setting_qs = utils.models.DashboardSetting.objects.all()
-        if not dashboard_setting_qs.exists():
-            dashboard_setting_instance = utils.models.DashboardSetting.objects.create(title="Dashboard")
-            return dashboard_setting_instance
-        else:
-            dashboard_setting_instance = dashboard_setting_qs.last()
-            return dashboard_setting_instance
-        
-    dashboard_setting = dashboard_setting()
-    
-    try:
-        if dashboard_setting.allow_translation:
-            bbs_translation_qs = utils.models.BBStranslation.objects.filter(
-                english_version__iexact=value
-            )
-            if bbs_translation_qs.exists():
-                return bbs_translation_qs.last().japanese_version
-            elif dashboard_setting.allow_auto_translation:
-                return GoogleTranslator(source='auto', target='ja').translate(value)
-            else:
-                return value
-    except Exception as e:
-        print(f"Exception: {str(e)}")
-        return value
+    # def dashboard_setting():
+    #     dashboard_setting_qs = utils.models.DashboardSetting.objects.all()
+    #     if not dashboard_setting_qs.exists():
+    #         dashboard_setting_instance = utils.models.DashboardSetting.objects.create(title="Dashboard")
+    #         return dashboard_setting_instance
+    #     else:
+    #         dashboard_setting_instance = dashboard_setting_qs.last()
+    #         return dashboard_setting_instance
+    #
+    # dashboard_setting = dashboard_setting()
+    #
+    # try:
+    #     if dashboard_setting.allow_translation:
+    #         bbs_translation_qs = utils.models.BBStranslation.objects.filter(
+    #             english_version__iexact=value
+    #         )
+    #         if bbs_translation_qs.exists():
+    #             return bbs_translation_qs.last().japanese_version
+    #         elif dashboard_setting.allow_auto_translation:
+    #             return GoogleTranslator(source='auto', target='ja').translate(value)
+    #         else:
+    #             return value
+    # except Exception as e:
+    #     print(f"Exception: {str(e)}")
+    #     return value
         
     return value

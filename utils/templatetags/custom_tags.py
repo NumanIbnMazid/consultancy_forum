@@ -94,37 +94,34 @@ def to_title(value):
     result = value.replace("_", " ").title()
     return result
 
-# {{ ''|translate_to_jp }}
+
 @register.filter
 def translate_to_jp(value):
-    # print(len(value))
-    # str.length == 5000
-    # print(len(value))
-    def dashboard_setting():
-        dashboard_setting_qs = DashboardSetting.objects.all()
-        if not dashboard_setting_qs.exists():
-            dashboard_setting_instance = DashboardSetting.objects.create(title="Dashboard")
-            return dashboard_setting_instance
-        else:
-            dashboard_setting_instance = dashboard_setting_qs.last()
-            return dashboard_setting_instance
-        
-    dashboard_setting = dashboard_setting()
-    
-    try:
-        if dashboard_setting.allow_translation:
-            bbs_translation_qs = BBStranslation.objects.filter(
-                english_version__iexact=value
-            )
-            if bbs_translation_qs.exists():
-                return bbs_translation_qs.last().japanese_version
-            elif dashboard_setting.allow_auto_translation:
-                return GoogleTranslator(source='auto', target='ja').translate(value)
-            else:
-                return value
-    except Exception as e:
-        print(f"Exception: {str(e)}")
-        return value
+    # def dashboard_setting():
+    #     dashboard_setting_qs = DashboardSetting.objects.all()
+    #     if not dashboard_setting_qs.exists():
+    #         dashboard_setting_instance = DashboardSetting.objects.create(title="Dashboard")
+    #         return dashboard_setting_instance
+    #     else:
+    #         dashboard_setting_instance = dashboard_setting_qs.last()
+    #         return dashboard_setting_instance
+    #
+    # dashboard_setting = dashboard_setting()
+    #
+    # try:
+    #     if dashboard_setting.allow_translation:
+    #         bbs_translation_qs = BBStranslation.objects.filter(
+    #             english_version__iexact=value
+    #         )
+    #         if bbs_translation_qs.exists():
+    #             return bbs_translation_qs.last().japanese_version
+    #         elif dashboard_setting.allow_auto_translation:
+    #             return GoogleTranslator(source='auto', target='ja').translate(value)
+    #         else:
+    #             return value
+    # except Exception as e:
+    #     print(f"Exception: {str(e)}")
+    #     return value
 
     return value
 

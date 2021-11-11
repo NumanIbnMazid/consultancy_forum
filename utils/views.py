@@ -121,7 +121,7 @@ def get_translation_common_contexts(request):
 
 @method_decorator(dashboard_decorators, name='dispatch')
 class BBStranslationCreateView(CreateView):
-    template_name = "dashboard/snippets/manage.html"
+    template_name = "dashboard/snippets/translation-manage.html"
     form_class = BBStranslationManageForm
 
     def form_valid(self, form, **kwargs):
@@ -195,3 +195,12 @@ class BBStranslationUpdateView(UpdateView):
 @login_required
 def delete_translation(request):
     return delete_simple_object(request=request, key='slug', model=BBStranslation, redirect_url="utils:create_translation")
+
+# ...............***............... JSON File Download ...............***...............
+
+
+@login_required()
+def json_file_export(request):
+    translation_qs = BBStranslation.objects.all()
+    translation_list = list(translation_qs.values())
+    return JsonResponse(translation_list, safe=False)

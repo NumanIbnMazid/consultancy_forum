@@ -26,10 +26,7 @@ from faq.models import FAQ
 # translator
 from .utils import translate_to_jp
 
-# For Json Response
-from django.http import JsonResponse
-import json,requests, time
-from django.shortcuts import render, redirect
+
 
 
 dashboard_decorators = [login_required, has_dashboard_permission_required]
@@ -42,7 +39,6 @@ class DashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
         context["page_title"] = "Dashboard"
-
         context['test_data'] = "Dashboard, Posts, Threads"
         return context
 

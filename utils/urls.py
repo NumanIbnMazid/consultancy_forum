@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
-    DashboardSettingView, BBStranslationCreateView, BBStranslationDetailView, BBStranslationUpdateView, delete_translation
+    DashboardSettingView, BBStranslationCreateView, BBStranslationDetailView, BBStranslationUpdateView,
+    delete_translation,json_file_export
 )
 
 
@@ -11,4 +12,5 @@ urlpatterns = [
     path("update-translation/<slug>/", BBStranslationUpdateView.as_view(), name="update_translation"),
     path("translation/<slug>/detail/", BBStranslationDetailView.as_view(), name="translation_detail"),
     path("delete/translation/", delete_translation, name="delete_translation"),
+    path("json_file_export/", json_file_export, name="json_file_export"),
 ]

@@ -25,7 +25,8 @@ from plans.models import (PointPlan, FlatRatePlan, UserWalletTransaction)
 from faq.models import FAQ
 # translator
 from .utils import translate_to_jp
-
+from django.utils.translation import gettext as _
+from django.utils.translation import get_language, activate, gettext
 
 
 
@@ -39,10 +40,19 @@ class DashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
         context["page_title"] = "Dashboard"
-        context['test_data'] = "Dashboard, Posts, Threads"
+        # context['trans'] = _("hello")
+        trans = translate(language='ja')
+        context['trans']=trans
         return context
 
-
+def translate(language):
+    cur_language = get_language()
+    try:
+        activate(language)
+        text = gettext('hello')
+    finally:
+        activate(cur_language)
+    return text
 """ 
 -------------------------------------------------------------------
                            ** Thread ***

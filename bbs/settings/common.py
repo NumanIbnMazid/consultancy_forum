@@ -76,6 +76,7 @@ CUSTOM_MIDDLEWARES = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -127,6 +128,18 @@ USE_TZ = True
 
 """ *** Static & Media Files Configurations *** """
 STATIC_URL = '/static/'
+
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGE_CODE = 'en'
+
+LANGUAGES = (
+    ('en', _('English')),
+    ('ja', _('Japanese')),
+)
+LOCALE_PATHS =(
+    os.path.join(BASE_DIR,'locale/'),
+)
 MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-15 06:15+0000\n"
+"POT-Creation-Date: 2021-11-15 12:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: bbs/settings/common.py:134
+#: bbs/dashboard_views.py:42
+msgid "hello"
+msgstr "こんにちは"
+
+#: bbs/settings/common.py:137
 msgid "English"
 msgstr ""
 
-#: bbs/settings/common.py:135
+#: bbs/settings/common.py:138
 msgid "Japanese"
 msgstr ""
 
@@ -354,10 +358,6 @@ msgstr ""
 msgid ""
 "<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your e-"
 "mail address</a>."
-msgstr ""
-
-#: bbs/templates/dashboard/pages/index.html:59
-msgid "いらっしゃいませ"
 msgstr ""
 
 #: env/lib/python3.8/site-packages/ckeditor_uploader/forms.py:6
@@ -2023,7 +2023,3 @@ msgstr ""
 #: utils/models.py:32 utils/models.py:37
 msgid "Hidden"
 msgstr ""
-
-#: utils/views.py:217
-msgid "hello Bangladesh"
-msgstr "こんにちはバングラデシュ"

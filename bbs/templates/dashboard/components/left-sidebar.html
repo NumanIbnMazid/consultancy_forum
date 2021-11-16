@@ -1,5 +1,5 @@
 {% load custom_tags %}
-
+{% load i18n %}
 <div class="main-menu menu-fixed {{ dashboard_setting.get_menu_class }} menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
@@ -7,7 +7,8 @@
                     <!-- <span class="brand-logo">
                     </span> -->
                     <h2 class="brand-text">{{ dashboard_setting.title|translate_to_jp }}</h2>
-                </a></li>
+                </a>
+            </li>
             <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse"><i
                 class="d-block d-xl-none text-primary toggle-icon font-medium-4" data-feather="x"></i><i
                 class="d-none d-xl-block collapse-toggle-icon font-medium-4  text-primary" data-feather="disc"
@@ -15,12 +16,34 @@
             </li>
         </ul>
     </div>
+
     
     <div class="shadow-bottom"></div>
 
     <!-- BEGIN: Main-Menu-Content -->
     <nav class="main-menu-content mt-2">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+            <li class="nav-item">
+                <a class="d-flex align-items-center" href="#">
+<!--                    <i data-feather="layout"></i>-->
+                    <span class="menu-title text-truncate" data-i18n="Collapsable Menu"><i class="fa fa-globe" aria-hidden="true"></i></span>
+                </a>
+                <ul class="menu-content">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    {% get_language_info_list for LANGUAGES as languages %}
+
+                    {% for lang in languages %}
+                        <li>
+                            <a class="d-flex align-items-center" href="/{{ lang.code }}/">
+                                <i class="fa fa-flag" aria-hidden="true"></i>
+                                <span class="menu-item text-truncate" data-i18n={{lang.name_local}}>{{ lang.name_local }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            </li>
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="{% url 'dashboard' %}">
                     <i class="fas fa-tachometer-alt"></i>

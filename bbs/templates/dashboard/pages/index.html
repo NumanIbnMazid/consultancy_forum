@@ -2,7 +2,7 @@
 
 {% block content %}
 {% load custom_tags %}
-
+{% load i18n %}
 <div class="row">
     <div class="col-12">
         <div class="alert alert-primary" role="alert">
@@ -17,9 +17,12 @@
                 </strong>
             </div>
         </div>
-
-        <h1>{{ test_data|translate_to_jp }}</h1>
-        <p>{{ trans }}</p>
+        <div class="container">
+            <p>{% translate 'hello' %}</p>
+        </div>
+<!--        <h1>{{ test_data|translate_to_jp }}</h1>-->
+<!--        -->
+<!--        {{ trans }}-->
 
 
     </div>

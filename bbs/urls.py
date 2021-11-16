@@ -6,12 +6,15 @@ from django.conf.urls import url
 import debug_toolbar
 # from django.views.static import serve
 from . import views
+from django.conf.urls.i18n import i18n_patterns
+from  django.utils.translation import gettext_lazy as _
 
 """ User Panel Views """
 from .views import (
     HomeView, create_husband
 )
 """ Dashboard Views """
+
 from .views import (
     DashboardView, 
     # Thread Views
@@ -25,6 +28,7 @@ from .views import (
     delete_user_wallet_transaction, PostListView, PostDetailView,delete_post,PostUpdateView,
     FAQCreateView,FAQDetailView, FAQUpdateView, delete_faq
 )
+
 
 USER_PANEL_URLS = [
     path("", HomeView.as_view(), name="home"),
@@ -95,13 +99,18 @@ urlpatterns = [
     # url(r'^static/(?P<path>.*)$', serve,
     #     {'document_root': settings.STATIC_ROOT}),
     # Application URLS
-    path('admin/', admin.site.urls),
+    path(_('admin/'), admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path("select2/", include("django_select2.urls")),
     path('__debug__/', include(debug_toolbar.urls)),
 ] + USER_PANEL_URLS + DASHBOARD_PANEL_URLS
 
+
+urlpatterns += i18n_patterns(
+    path("", DashboardView.as_view(), name="translation")
+    # path('', include('lang.urls', namespace='lang'))
+)
 if settings.DEBUG:
     urlpatterns = urlpatterns + \
         static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
